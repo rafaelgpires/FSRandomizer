@@ -8,7 +8,7 @@ const db     = 'ch_fsrandomizer';
 class SQLConn {
 	private $mysqli;
 	public function __construct() {
-		$mysqli = new mysqli(server, user, pass, db);
+		$mysqli = new \mysqli(server, user, pass, db);
 		if($mysqli->connect_errno) die("Failed to connect to MySQL: " . $mysqli->connect_errno . ") " . $mysqli->connect_error);
 	}
 	
