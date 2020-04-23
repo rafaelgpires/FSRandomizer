@@ -7,25 +7,35 @@ const db     = 'ch_fsrandomizer';
 
 class SQLConn {
 	private $mysqli;
+	
 	public function __construct() {
-		$mysqli = new \mysqli(server, user, pass, db);
-		if($mysqli->connect_errno) die("Failed to connect to MySQL: " . $mysqli->connect_errno . ") " . $mysqli->connect_error);
+		$this->mysqli = new \mysqli(server, user, pass, db);
+		if($this->mysqli->connect_errno)
+			trigger_error((
+				"Failled to connect to MySQL: (" . 
+				$this->mysqli->connect_errno . ") " . 
+				$this->mysqli->connect_error
+				), E_USER_ERROR);
 	}
 	
 	public function readHash($id) {
-		$id    = $mysqli->real_escape_string($id);
-		$query = $mysqli->query("SELECT hash FROM lists WHERE id='$id'");
+		$id    = $this->mysqli->real_escape_string($id);
+		$query = $this->mysqli->query("SELECT hash FROM lists WHERE id='$id'");
 		$hash  = $query->fetch_row();
 		$query->free();
 		
-		return $hash[0];
+		return $hash ? $hash[0] : null;
 	}
 	
 	public function storeHash($id, $hash) {
-		$id   = $mysqli->real_escape_string($id);
-		$hash = $mysqli->real_escape_string($hash);
-		if(!$mysqli->query("INSERT INTO lists(id,hash) VALUES ('$id','$hash')"))
-			die("Failed to store the list: " . $mysqli_errno . ") " . $mysqli->error);
+		$id   = $this->mysqli->real_escape_string($id);
+		$hash = $this->mysqli->real_escape_string($hash);
+		if(!$this->mysqli->query("INSERT INTO lists(id,hash) VALUES ('$id','$hash')"))
+			trigger_error((
+				"Failled to execute Query: (" . 
+				$this->mysqli->connect_errno . ") " . 
+				$this->mysqli->connect_error
+				), E_USER_ERROR);
 	}
 }
 ?>

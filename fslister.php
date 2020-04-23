@@ -19,6 +19,7 @@ class FSLister {
 
 	public $fslist;							//Output: Array list
 	public $hash;							//Output: Hash of the list
+	public $listID;							//Unique ID given to the created list
 	
 	#Methods
 	public function __construct() {
@@ -26,7 +27,6 @@ class FSLister {
 		$this->breakdown = file_get_contents(breakdownfile);	
 		$this->songlist  = \Includes\notepadTable($this->breakdown, 'table', '    • ');
 	}
-	
 	public function createList() {
 		//Count the chapters
 		$chaptercount = ceil(songs/$this->songsperchapter);
@@ -67,7 +67,7 @@ class FSLister {
 				
 				//Write the song into the chapter
 				$song           = $fssonglist[$songkey];
-				$song[3]        = array_search($song[1], array_column($this->songlist, 1));
+				$song[3]        = $this->findSongKey($song);
 				$song[1]        = ($superincdiff ? '[SUPER ENCORE] ' : ($incdiff ? '[ENCORE] ' : '')) . $song[1];
 				$chapters[$i][] = $song;                 //Set the new song with a prefix and store the key
 				unset($fssonglist[$songkey]);            //Remove the song from the list so it doesn't repeat
@@ -75,13 +75,20 @@ class FSLister {
 			}
 		}
 		
-		//Store the list
+		//Hash and store the list
 		$this->fslist = $chapters;
+		$this->createHash();
+		$this->storeList();
 	}
-	
-	public function createHash() {
-		$this->hash = '';
-		if(!$this->fslist) die("Error: Attempted to get a hash when a list hasn't been created yet.");
+	public function getList($id) {
+		$this->hash = $this->database->readHash($id);
+		if($this->hash) $this->readHash();
+		else trigger_error("Invalid ID.", E_USER_ERROR);
+	}
+
+	private function createHash() {
+		$this->hash = ''; //Reset hash
+
 		foreach($this->fslist as $chapter) {
 			$this->hash .= '|'; //Write chapter separator
 			foreach($chapter as $song) {
@@ -101,8 +108,7 @@ class FSLister {
 		//Store hash
 		$this->hash = substr($this->hash, 1);
 	}
-	
-	public function readHash($hash = null) {
+	private function readHash($hash = null) {
 		$hash = $hash ? $hash : $this->hash;
 		
 		//Check for errors
@@ -135,6 +141,20 @@ class FSLister {
 				$this->fslist[$chcounter][] = $song;
 			}
 		}
+	}
+	private function storeList() {
+		$this->listID = uniqid(); //Create a unique ID for the list
+		$this->database->storeHash($this->listID, $this->hash);
+	}
+	private function findSongKey($songarr) {
+		foreach($this->songlist as $key=>$song) {
+			//Match song name and game
+			if($song[1] == $songarr[1] && $song[2] == $songarr[2])
+				return $key;
+		}
+		
+		//Song not found
+		trigger_error("Song not found?", E_USER_ERROR);
 	}
 }
 ?>
