@@ -4,9 +4,6 @@ FSRandomizer allows you to create your own career in Clone Hero with the entire 
 # Project Manager
 https://trello.com/b/1JevMmjv/project-001-kanban-ch-fsrandomizer
 
-# To Do
-Phase 2: Replace 10% with a modulus of 5? For however many times $songcount is a multiple of 5, add an encore?
-
 # Notes
 
 Master FC Breakdown created by Phase 1 in Deprecated.
