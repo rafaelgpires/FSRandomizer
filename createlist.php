@@ -1,7 +1,5 @@
 <?php
 namespace Lister;
-include("database.php");
-include("includes/func_notepadTable.php");
 const songs = 660;
 const breakdownfile = "breakdown.txt";
 
