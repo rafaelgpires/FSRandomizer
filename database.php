@@ -11,11 +11,7 @@ class SQLConn {
 	public function __construct() {
 		$this->mysqli = new \mysqli(server, user, pass, db);
 		if($this->mysqli->connect_errno)
-			trigger_error((
-				"Failled to connect to MySQL: (" . 
-				$this->mysqli->connect_errno . ") " . 
-				$this->mysqli->connect_error
-				), E_USER_ERROR);
+			trigger_error($this->mysqli->connect_error, E_USER_ERROR);
 	}
 	
 	public function readHash($id) {
@@ -31,11 +27,7 @@ class SQLConn {
 		$id   = $this->mysqli->real_escape_string($id);
 		$hash = $this->mysqli->real_escape_string($hash);
 		if(!$this->mysqli->query("INSERT INTO lists(id,hash) VALUES ('$id','$hash')"))
-			trigger_error((
-				"Failled to execute Query: (" . 
-				$this->mysqli->connect_errno . ") " . 
-				$this->mysqli->connect_error
-				), E_USER_ERROR);
+			trigger_error($this->mysqli->connect_error, E_USER_ERROR);
 	}
 }
 ?>

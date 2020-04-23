@@ -11,15 +11,15 @@ class FSLister {
 	public $incdiff_bonus       = 10;		//Intended % of RNG added to song_rng for hard encores
 	public $superincdiff_chance = 5;		//Intended multiplier chance for much harder encores
 	public $superincdiff_bonus  = 25;		//Intended % of RNG added to song_rng for much harder encores
-	public $resetencores        = false;	//Whether to reset encores during each encore song
+	public $resetencores        = false;		//Whether to reset encores during each encore song
 
-	private $database;						//Instance of /SQL/SQLConn
-	private $breakdown;						//For reading breakdown.txt
-	private $songlist;						//For interpreting breakdown.txt
+	private $database;				//Instance of /SQL/SQLConn
+	private $breakdown;				//For reading breakdown.txt
+	private $songlist;				//For interpreting breakdown.txt
 
-	public $fslist;							//Output: Array list
-	public $hash;							//Output: Hash of the list
-	public $listID;							//Unique ID given to the created list
+	public $fslist;					//Output: Array list
+	public $hash;					//Output: Hash of the list
+	public $listID;					//Unique ID given to the created list
 	
 	#Methods
 	public function __construct() {
@@ -66,12 +66,12 @@ class FSLister {
 				$songkey = rand($min, $max);
 				
 				//Write the song into the chapter
-				$song           = $fssonglist[$songkey];
-				$song[3]        = $this->findSongKey($song);
-				$song[1]        = ($superincdiff ? '[SUPER ENCORE] ' : ($incdiff ? '[ENCORE] ' : '')) . $song[1];
-				$chapters[$i][] = $song;                 //Set the new song with a prefix and store the key
-				unset($fssonglist[$songkey]);            //Remove the song from the list so it doesn't repeat
-				$fssonglist = array_values($fssonglist); //Reindex the array
+				$song    = $fssonglist[$songkey];
+				$song[3] = $this->findSongKey($song);
+				$song[1] = ($superincdiff ? '[SUPER ENCORE] ' : ($incdiff ? '[ENCORE] ' : '')) . $song[1];
+				$chapters[$i][] = $song;		//Set the new song with a prefix and store the key
+				unset($fssonglist[$songkey]);		//Remove the song so it doesn't repeat
+				$fssonglist = array_values($fssonglist);//Reindex the array
 			}
 		}
 		
