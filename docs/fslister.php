@@ -119,10 +119,8 @@ class FSLister {
 		$this->fslist = array();
 		
 		//Read the hash by chapters
-		$chcounter = 0;
 		$hashlist = explode('|', $hash);
 		foreach($hashlist as $hashchapter=>$hashsongs) {
-			$chcounter++;
 			for($i=0; $i<strlen($hashsongs); ($i = $i+4)) {
 				//Encore switch
 				switch($hashsongs[($i)]) {
@@ -138,7 +136,7 @@ class FSLister {
 				$song[3] = $songid;
 				
 				//Register the song in the chapter
-				$this->fslist[$chcounter][] = $song;
+				$this->fslist[$hashchapter][] = $song;
 			}
 		}
 	}
