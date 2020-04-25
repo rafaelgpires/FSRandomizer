@@ -9,5 +9,8 @@ if(isset($_GET['uniqueID']) && isset($_GET['output'])) {
 	switch($_GET['output']) {
 		case 'hash': die($list->hash); break;
 	}
+} else {
+	$list = new \Lister\FSLister();
+	$list->createList();
 }
 ?>

@@ -88,17 +88,14 @@ class FSLister {
 
 	private function createHash() {
 		$this->hash = ''; //Reset hash
-
+		
 		foreach($this->fslist as $chapter) {
 			$this->hash .= '|'; //Write chapter separator
 			foreach($chapter as $song) {
 				//Check for encores
-				preg_match('/^(\[ENCORE\] )|(\[SUPER ENCORE\] )/', $song[1], $encore);
-				switch(true) {
-					case isset($encore[1]): $encore = 1; break;
-					case isset($encore[2]): $encore = 2; break;
-					default: $encore = 0;
-				}
+				$match = preg_match('/^(\[ENCORE\] )|(\[SUPER ENCORE\] )/', $song[1], $encore);
+				if($match) $encore = isset($encore[2]) ? 2 : 1;
+				else $encore = 0;
 				
 				//Write the hash for the song
 				$this->hash .= $encore . str_pad($song[3], 3, 0, STR_PAD_LEFT);
