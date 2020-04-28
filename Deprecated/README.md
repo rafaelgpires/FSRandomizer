@@ -2,7 +2,7 @@
 FSRandomizer allows you to create your own career in Clone Hero with the entire Guitar Hero series scaled by difficulty (with some surprises!) so that revisitting the games is as fun and exciting as playing career for the first time!
 
 # To Do
-Phase 2: Replace 10% with a modulus of 5? For however many times $songcount is a multiple of 5, add an encore?
+Phase 2: For however many times $songcount is a multiple of 5, add an encore?
 
 # Notes
 
