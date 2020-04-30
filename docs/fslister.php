@@ -1,5 +1,4 @@
 <?php
-namespace Lister;
 const songs = 660;
 const breakdownfile = "breakdown.txt";
 
@@ -23,7 +22,7 @@ class FSLister {
 	
 	#Methods
 	public function __construct() {
-		$this->database  = new \SQL\SQLConn();
+		$this->database  = new SQLConn();
 		$this->breakdown = file_get_contents(breakdownfile);	
 		$this->songlist  = \Includes\notepadTable($this->breakdown, 'table', '    • ');
 	}

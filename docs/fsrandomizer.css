@@ -1,0 +1,6 @@
+body { font-family: "Arial"; }
+form { margin-block-end: 0; }
+.navbar-brand { color: #2699FB !important; font-size: 14pt; }
+.nav-link { color: #2699FB !important; font-size: 10pt; font-weight: bold; }
+.input-group-text { color: #2699FB !important; font-size: 10pt; font-weight: bold; }
+.form-control { font-size: 10pt; }
