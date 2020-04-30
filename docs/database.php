@@ -1,5 +1,4 @@
 <?php
-namespace SQL;
 const server = 'localhost';
 const user   = 'root';
 const pass   = 'lara';
