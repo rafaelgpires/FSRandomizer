@@ -7,13 +7,14 @@ require("fslister.php");
 require("error.php");
 
 //Parse input
-if(isset($_GET['uniqueID'])) {
+if(isset($_GET['UniqueID'])) {
 	//Unique is given and output variable is set
 	if(isset($_GET['output'])) {
 		$list = new FSLister();
-		$list->getList($_GET['uniqueID']);
+		$success = $list->getHash($_GET['UniqueID']);
 		switch($_GET['output']) {
-			case 'hash': echo $list->hash; break;
+			case 'hash': echo $list->hash; break; //Empty if Invalid ID
+			case 'validate': echo json_encode($success); break;
 			default: error("No valid output type given.", true);
 		}
 	} else require("fctracker.php"); //Unique is given but no output requested, load fctracker.php
@@ -41,18 +42,19 @@ if(isset($_GET['uniqueID'])) {
 				<a class="nav-item nav-link" href="#">BUGS</a>
 				<a class="nav-item nav-link" href="#">CONTACT</a>
 			</div>
-			<form class="form-inline ml-2">
+			<form class="form-inline ml-2" id="InputIDForm">
 				<div class="input-group input-group-sm">
 					<div class="input-group-prepend"><span class="input-group-text">#</span></div>
-					<input type="text" class="form-control" placeholder="List ID" name="UniqueID" size="13">
+					<input type="text" class="form-control" placeholder="List ID" name="UniqueID" id="InputID" size="13">
 				</div>
 			</form>
 		</nav>
 	</div>
 	
-	<!-- jQuery, Popper, bootstrap.js -->
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+	<!-- jQuery, Popper, bootstrap.js, Local scripts -->
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+	<script src="fsrandomizer.js"></script>
 </body>
 </html>

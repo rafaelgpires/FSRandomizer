@@ -79,32 +79,11 @@ class FSLister {
 		$this->createHash();
 		$this->storeList();
 	}
-	public function getList($id) {
+	public function getHash($id): bool {
 		$this->hash = $this->database->readHash($id);
-		if($this->hash) $this->readHash();
-		else trigger_error("Invalid ID.", E_USER_ERROR);
+		return !is_null($this->hash);
 	}
-
-	private function createHash() {
-		$this->hash = ''; //Reset hash
-		
-		foreach($this->fslist as $chapter) {
-			$this->hash .= '|'; //Write chapter separator
-			foreach($chapter as $song) {
-				//Check for encores
-				$match = preg_match('/^(\[ENCORE\] )|(\[SUPER ENCORE\] )/', $song[1], $encore);
-				if($match) $encore = isset($encore[2]) ? 2 : 1;
-				else $encore = 0;
-				
-				//Write the hash for the song
-				$this->hash .= $encore . str_pad($song[3], 3, 0, STR_PAD_LEFT);
-			}
-		}
-		
-		//Store hash
-		$this->hash = substr($this->hash, 1);
-	}
-	private function readHash($hash = null) {
+	public function readHash($hash = null) {
 		$hash = $hash ? $hash : $this->hash;
 		
 		//Check for errors
@@ -135,6 +114,26 @@ class FSLister {
 				$this->fslist[$hashchapter][] = $song;
 			}
 		}
+	}
+
+	private function createHash() {
+		$this->hash = ''; //Reset hash
+		
+		foreach($this->fslist as $chapter) {
+			$this->hash .= '|'; //Write chapter separator
+			foreach($chapter as $song) {
+				//Check for encores
+				$match = preg_match('/^(\[ENCORE\] )|(\[SUPER ENCORE\] )/', $song[1], $encore);
+				if($match) $encore = isset($encore[2]) ? 2 : 1;
+				else $encore = 0;
+				
+				//Write the hash for the song
+				$this->hash .= $encore . str_pad($song[3], 3, 0, STR_PAD_LEFT);
+			}
+		}
+		
+		//Store hash
+		$this->hash = substr($this->hash, 1);
 	}
 	private function storeList() {
 		$this->listID = uniqid(); //Create a unique ID for the list
