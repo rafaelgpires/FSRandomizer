@@ -87,7 +87,7 @@ class FSLister {
 		$hash = $hash ? $hash : $this->hash;
 		
 		//Check for errors
-		if(!$hash) trigger_error("No hash given.", E_USER_ERROR);
+		if(!$hash) error("Internal Error: No hash given.", true);
 		
 		//Reset the list
 		$this->hash   = $hash;
@@ -147,7 +147,7 @@ class FSLister {
 		}
 		
 		//Song not found
-		trigger_error("Song not found?", E_USER_ERROR);
+		error("Internal error: Couldn't find a song.", true);
 	}
 }
 ?>
