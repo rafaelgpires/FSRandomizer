@@ -88,7 +88,7 @@ if(isset($_GET['generate'])) {
 									<div class="col p-0 text-right align-self-center d-none d-lg-block"><img src="./images/+.png" /></div>
 								</div>
 							</a>
-							<a href="#" target="_blank" class="link-unstyled"><div class="row text-nowrap"><p>Download The full GH Series Charts!</p></div></a>
+							<div class="row text-nowrap"><p><a href="#" target="_blank">Download</a> the full GH Series Charts!</p></div>
 							<div class="row text-nowrap"><p>Click <a href="#" target="_blank">here</a> for DLC and <a href="#" target="_blank">here</a> for extra original content.</p></div>
 						</div>
 					</div>
