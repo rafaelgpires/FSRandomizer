@@ -1,6 +1,9 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(.*)$ index.php?uniqueID=$1 [QSA,L]
-</IfModule>
+RewriteEngine On
+RewriteBase /FSRandomizer/docs/
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s\/?(index\.php)?[^&=]+=([^&\ ]+)(\ |$)
+RewriteRule ^(.*)$ %2 [R=301,QSD,L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php?UniqueID=$1 [QSA,L]
