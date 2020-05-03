@@ -1,5 +1,4 @@
 <?php
-namespace Lister;
 const songs = 660;
 const breakdownfile = "breakdown.txt";
 
@@ -23,7 +22,7 @@ class FSLister {
 	
 	#Methods
 	public function __construct() {
-		$this->database  = new \SQL\SQLConn();
+		$this->database  = new SQLConn();
 		$this->breakdown = file_get_contents(breakdownfile);	
 		$this->songlist  = \Includes\notepadTable($this->breakdown, 'table', '    • ');
 	}
@@ -80,36 +79,15 @@ class FSLister {
 		$this->createHash();
 		$this->storeList();
 	}
-	public function getList($id) {
+	public function getHash($id): bool {
 		$this->hash = $this->database->readHash($id);
-		if($this->hash) $this->readHash();
-		else trigger_error("Invalid ID.", E_USER_ERROR);
+		return !is_null($this->hash);
 	}
-
-	private function createHash() {
-		$this->hash = ''; //Reset hash
-		
-		foreach($this->fslist as $chapter) {
-			$this->hash .= '|'; //Write chapter separator
-			foreach($chapter as $song) {
-				//Check for encores
-				$match = preg_match('/^(\[ENCORE\] )|(\[SUPER ENCORE\] )/', $song[1], $encore);
-				if($match) $encore = isset($encore[2]) ? 2 : 1;
-				else $encore = 0;
-				
-				//Write the hash for the song
-				$this->hash .= $encore . str_pad($song[3], 3, 0, STR_PAD_LEFT);
-			}
-		}
-		
-		//Store hash
-		$this->hash = substr($this->hash, 1);
-	}
-	private function readHash($hash = null) {
+	public function readHash($hash = null) {
 		$hash = $hash ? $hash : $this->hash;
 		
 		//Check for errors
-		if(!$hash) trigger_error("No hash given.", E_USER_ERROR);
+		if(!$hash) error("Internal Error: No hash given.", true);
 		
 		//Reset the list
 		$this->hash   = $hash;
@@ -137,6 +115,26 @@ class FSLister {
 			}
 		}
 	}
+
+	private function createHash() {
+		$this->hash = ''; //Reset hash
+		
+		foreach($this->fslist as $chapter) {
+			$this->hash .= '|'; //Write chapter separator
+			foreach($chapter as $song) {
+				//Check for encores
+				$match = preg_match('/^(\[ENCORE\] )|(\[SUPER ENCORE\] )/', $song[1], $encore);
+				if($match) $encore = isset($encore[2]) ? 2 : 1;
+				else $encore = 0;
+				
+				//Write the hash for the song
+				$this->hash .= $encore . str_pad($song[3], 3, 0, STR_PAD_LEFT);
+			}
+		}
+		
+		//Store hash
+		$this->hash = substr($this->hash, 1);
+	}
 	private function storeList() {
 		$this->listID = uniqid(); //Create a unique ID for the list
 		$this->database->storeHash($this->listID, $this->hash);
@@ -149,7 +147,7 @@ class FSLister {
 		}
 		
 		//Song not found
-		trigger_error("Song not found?", E_USER_ERROR);
+		error("Internal error: Couldn't find a song.", true);
 	}
 }
 ?>

@@ -1,5 +1,4 @@
 <?php
-namespace SQL;
 const server = 'localhost';
 const user   = 'root';
 const pass   = 'lara';
@@ -11,10 +10,10 @@ class SQLConn {
 	public function __construct() {
 		$this->mysqli = new \mysqli(server, user, pass, db);
 		if($this->mysqli->connect_errno)
-			trigger_error($this->mysqli->connect_error, E_USER_ERROR);
+			error("Couldn't connect to database.", true);
 	}
 	
-	public function readHash($id) {
+	public function readHash($id):?string {
 		$id    = $this->mysqli->real_escape_string($id);
 		$query = $this->mysqli->query("SELECT hash FROM lists WHERE id='$id'");
 		$hash  = $query->fetch_row();
@@ -23,11 +22,10 @@ class SQLConn {
 		return $hash ? $hash[0] : null;
 	}
 	
-	public function storeHash($id, $hash) {
+	public function storeHash($id, $hash):bool {
 		$id   = $this->mysqli->real_escape_string($id);
 		$hash = $this->mysqli->real_escape_string($hash);
-		if(!$this->mysqli->query("INSERT INTO lists(id,hash) VALUES ('$id','$hash')"))
-			trigger_error($this->mysqli->connect_error, E_USER_ERROR);
+		return $this->mysqli->query("INSERT INTO lists(id,hash) VALUES ('$id','$hash')");
 	}
 }
 ?>
