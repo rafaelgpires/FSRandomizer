@@ -1,9 +1,22 @@
 RewriteEngine On
 RewriteBase /FSRandomizer/docs/
 
+#Handle errors
+ErrorDocument 400 /FSRandomizer/docs/400
+ErrorDocument 401 /FSRandomizer/docs/401
+ErrorDocument 404 /FSRandomizer/docs/404
+ErrorDocument 403 /FSRandomizer/docs/403
+ErrorDocument 500 /FSRandomizer/docs/500
+RewriteCond %{REQUEST_URI} ^(.*)\/(400|403|404|500)$
+RewriteRule ^(.*)$ index.php?http_error=$1 [QSD,L]
+
+#Force Clean URL
+#Pick up any other 1-variable GET request and clean it
 RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s\/?(index\.php)?[^&=]+=([^&\ ]+)(\ |$)
 RewriteRule ^(.*)$ %2 [R=301,QSD,L]
 
+#Clean URL
+#Pick up any top-level text as GET on UniqueID (/asdf becomes index.php?UniqueID=asdf)
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php?UniqueID=$1 [QSA,L]

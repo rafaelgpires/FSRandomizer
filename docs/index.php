@@ -26,8 +26,6 @@ if(isset($_GET['UniqueID'])) {
 			default: error("No valid output type given.", true);
 		}
 	} else require("fctracker.php"); //UniqueID is given but no output requested, load fctracker.php
-	
-	//Make sure no other code runs after this, without having to include it all in one big else
 	exit;
 }
 
@@ -37,6 +35,18 @@ if(isset($_GET['generate'])) {
 	$list->createList();
 	echo json_encode($list->listID);
 	exit;
+}
+
+
+//Parse input: Common HTTP Errors
+if(isset($_GET['http_error'])) {
+	switch($_GET['http_error']) {
+		case '400': error("Bad request<br />What's your browser doin'?", true); break;
+		case '403': error("Forbidden<br />Yo, get outta here.", true); break;
+		case '404': error("404<br />These aren't the pages you're looking for.", true); break;
+		case '500': error("Internal Error<br />I fucked up somewhere, sorry.", true); break;
+		default: error("You just wanted to see the error page, huh?", true);
+	} exit;
 }
 
 //Landing page
@@ -67,7 +77,7 @@ if(isset($_GET['generate'])) {
 					<button id="generator" class="btn btn-primary px-4 py-0">GENERATE</button>
 				</div>
 				<div class="row mt-4 d-flex justify-content-center">
-					<h1 class="text-center">Randomize a full Guitar Hero career!<br/>
+					<h1 class="text-center descriptor">Randomize a full Guitar Hero career!<br/>
 					Revisit the classics, ROCK ON!</h1>
 				</div>
 				<div class="row mt-4 d-flex justify-content-center">
