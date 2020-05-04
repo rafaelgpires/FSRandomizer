@@ -4,13 +4,13 @@ const breakdownfile = "breakdown.txt";
 
 class FSLister {
 	#Properties
-	public $songsperchapter     = 15;		//Intended # of songs per chapter
-	public $song_rng            = 25;		//Intended % of RNG within easiest songs
-	public $incdiff_chance      = 1;		//Intended chance for hard encores
-	public $incdiff_bonus       = 10;		//Intended % of RNG added to song_rng for hard encores
-	public $superincdiff_chance = 5;		//Intended multiplier chance for much harder encores
-	public $superincdiff_bonus  = 25;		//Intended % of RNG added to song_rng for much harder encores
-	public $resetencores        = false;		//Whether to reset encores during each encore song
+	public $nsongs			= 15;		//Intended # of songs per chapter
+	public $variance		= 25;		//Intended % of RNG within easiest songs
+	public $encore			= 100;		//Intended chance for hard encores
+	public $encorebonus		= 10;		//Intended % of RNG added to variance for hard encores
+	public $superencore		= 20;		//Intended multiplier chance for much harder encores
+	public $superencorebonus	= 25;		//Intended % of RNG added to variance for much harder encores
+	public $resetencores		= false;	//Whether to reset encores during each encore song
 
 	private $database;				//Instance of /SQL/SQLConn
 	private $breakdown;				//For reading breakdown.txt
@@ -28,7 +28,7 @@ class FSLister {
 	}
 	public function createList() {
 		//Count the chapters
-		$chaptercount = ceil(songs/$this->songsperchapter);
+		$chaptercount = ceil(songs/$this->nsongs);
 		$fssonglist   = $this->songlist;
 		$chapters     = array();
 		
@@ -39,29 +39,30 @@ class FSLister {
 			$superincdiff = false;
 			
 			//There's not enough songs to fill the chapter, so dump the remaining songs here
-			if(count($fssonglist) < $this->songsperchapter) {
+			if(count($fssonglist) < $this->nsongs) {
 				$chapters[$i] = $fssonglist;
 				break;
 			}
 			
 			//Put songs in this chapter
-			for($x=0; $x<$this->songsperchapter; $x++) {
+			for($x=0; $x<$this->nsongs; $x++) {
 				//Reset encores during each song if the option is enabled
 				if($this->resetencores) {
 					$incdiff      = false;
 					$superincdiff = false;
 				}
 				
-				//Final 10% of songs have a chance for encores
-				if(($x+1) >= floor((($this->songsperchapter/10)*9))) {
-					if(rand(1, $this->incdiff_chance)      == 1) $incdiff      = true;
-					if(rand(1, $this->superincdiff_chance) == 1) $superincdiff = true;
-					$diffbonus = $superincdiff ? $this->superincdiff_bonus : ($incdiff ? $this->incdiff_bonus : 0);
+				//Encores have a chance for increased difficulty
+				if($x >= ($this->nsongs - floor($this->nsongs/5))) {
+					if(rand(1, ($this->encore      /100)) == 1) $incdiff      = true;
+					if(rand(1, ($this->superencore /100)) == 1) $superincdiff = true;
+					$diffbonus = $superincdiff ? ($this->superencorebonus/100) : ($incdiff ? ($this->encorebonus/100) : 0);
 				} else $diffbonus = 0;
 				
-				//Get a song within 10%*$song_rng + $diffbonus of available songs
-				$min     = $diffbonus ? floor(((count($fssonglist)-1)/10)*($diffbonus/10)) : 0;
-				$max     = floor(((count($fssonglist)-1)/10)*(($diffbonus+$this->song_rng)/10));
+				//Get a song within $variance + $diffbonus of available songs
+				$count   = count($fssonglist);
+				$min     = $diffbonus ? floor($count * $diffbonus) : 0;
+				$max     = floor($count * (($this->variance/100) + $diffbonus));
 				$songkey = rand($min, $max);
 				
 				//Write the song into the chapter
