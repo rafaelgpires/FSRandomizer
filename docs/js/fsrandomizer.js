@@ -71,7 +71,7 @@ function validateOption(DOM, valid, addPer=true) {
 		var val = $(DOM).val().replace(/%/g, "");
 		$(DOM).removeClass('is-invalid').addClass('is-valid');
 		$("#options").data(DOM.id, val);
-		$(DOM).val(val + '%');
+		if(addPer) $(DOM).val(val + '%');
 		updateDescription();
 	}
 }
