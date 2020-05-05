@@ -54,16 +54,16 @@ class FSLister {
 				
 				//Encores have a chance for increased difficulty
 				if($x >= ($this->nsongs - floor($this->nsongs/5))) {
-					if(rand(1, ($this->encore      /100)) == 1) $incdiff      = true;
-					if(rand(1, ($this->superencore /100)) == 1) $superincdiff = true;
-					$diffbonus = $superincdiff ? ($this->superencorebonus/100) : ($incdiff ? ($this->encorebonus/100) : 0);
+					if($this->encore)      if(rand(1, ($this->encore      /100)) == 1) $incdiff      = true;
+					if($this->superencore) if(rand(1, ($this->superencore /100)) == 1) $superincdiff = true;
+					$diffbonus = $superincdiff ? $this->superencorebonus : ($incdiff ? $this->encorebonus : 0);
 				} else $diffbonus = 0;
 				
 				//Get a song within $variance + $diffbonus of available songs
 				$count   = count($fssonglist);
-				$min     = $diffbonus ? floor($count * $diffbonus) : 0;
-				$max     = floor($count * (($this->variance/100) + $diffbonus));
-				$songkey = rand($min, $max);
+				$min     = $diffbonus ? ceil($count * ($diffbonus/100)) : 1;
+				$max     = ceil($count * (($this->variance/100) + ($diffbonus/100)));
+				$songkey = rand($min, $max) - 1;
 				
 				//Write the song into the chapter
 				$song    = $fssonglist[$songkey];
