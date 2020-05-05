@@ -77,6 +77,7 @@ function validateOption(DOM, valid, addPer=true) {
 }
 
 //Generator: Options - Description
+$("#options").data({nsongs: 15, variance: 25, encore: 100, encorebonus: 10, superencore: 20, superencorebonus: 25, resetencores: false}); //Default
 function updateInput() { for (const [key, value] of Object.entries($("#options").data())) $(("#"+key)).val(value + (key != 'nsongs' ? '%' : '')).removeClass('is-valid').removeClass('is-invalid'); }
 function updateDescription() {
 	var options = $("#options").data();
@@ -93,7 +94,6 @@ function updateDescription() {
 
 //Generator: Options - UI
 $("#options").click(function(){ updateDescription(); updateInput(); $("#optionsMenu").modal('show'); });
-$("#reset").click(function() { $("#options").data({nsongs: 15, variance: 25, encore: 100, encorebonus: 10, superencore: 20, superencorebonus: 25, resetencores: false}); updateDescription(); updateInput(); }).click();
 $("#optionMenu").find('input').change(function(){
 	switch(this.id) {
 		case 'nsongs': validateOption(this, validateInteger(this.value, 660, 1), false); break;

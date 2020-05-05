@@ -171,9 +171,8 @@ if(isset($_GET['http_error'])) {
 											<p>Supers (<span class="info">20%</span>) are <span class="info">25% harder</span>.</p>
 											<p><span class="info">Consistent</span> difficulty within encores.</p>
 										</div>
-										<div class="row d-flex justify-content-center">
-											<button type="button" class="btn btn-primary mr-4" id="reset">Reset</button>
-											<button type="button" class="btn btn-primary ml-4" data-dismiss="modal">Close</button>
+										<div class="row d-flex justify-content-end">
+											<button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
 										</div>
 									</div>
 								</div>
