@@ -16,16 +16,20 @@ class HTML {
 
 //Parse input: UniqueID
 if(isset($_GET['UniqueID'])) {
-	//UniqueID is given and output variable is set
+	//UniqueID is given, check validity before continuing
+	$list = new FSLister();
+	$success = $list->getHash($_GET['UniqueID']);
+	
+	//Parse other options
 	if(isset($_GET['output'])) {
-		$list = new FSLister();
-		$success = $list->getHash($_GET['UniqueID']);
+		//Output has been requested
 		switch($_GET['output']) {
 			case 'hash': echo $list->hash; break; //Empty output if Invalid ID
 			case 'validate': echo json_encode($success); break;
 			default: error("No valid output type given.", true);
 		}
-	} else require("fctracker.php"); //UniqueID is given but no output requested, load fctracker.php
+	} elseif($success) require("fctracker.php"); //UniqueID is valid and there's no output request, load fctracker.php
+	else error('Invalid list ID!', true); //UniqueID is invalid and there's no output request, show error.
 	exit;
 }
 
@@ -68,7 +72,7 @@ if(isset($_GET['http_error'])) {
 </head>
 <body>
 	<!-- Content -->
-	<div class="container" style="height: 100vh">
+	<div class="container vh-100">
 		<!-- Navbar -->
 		<div class="row h-25 pt-4 align-items-top">
 			<?=$html->navbar?>
@@ -76,7 +80,7 @@ if(isset($_GET['http_error'])) {
 		
 		<!-- Generation -->
 		<div class="row h-50 align-items-center">
-			<div class="container mt-6">
+			<div class="container">
 				<div class="row d-flex justify-content-center">
 					<div class="alert d-none" role="alert" id="alert"></div>
 				</div>

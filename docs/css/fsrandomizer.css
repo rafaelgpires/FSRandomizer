@@ -21,3 +21,19 @@ form { margin-block-end: 0; }
 .option { font-size: 10pt; font-weight: bold; }
 .optionalert { font-size: 10pt; margin: 0; }
 .check-label { font-size: 7.8pt; font-weight: normal; }
+
+/* FCTracker: Header */
+.listheader { height: 350px; background: url('../images/crowd_silhouette.png') no-repeat center; }
+.listheader img { width: 100px; height: 100px; }
+.listheader h1 { margin: 0; font-size: 40px; font-weight: bold; font-family: 'Georgia'; color: #7F7F7F; }
+.listheader h2 { margin: 0; font-size: 20px; color: #7F7F7F; }
+.listicon { display: flex; justify-content: center; height: 100px; }
+.listtitle { display: flex; justify-content: center; height: 58px; padding-top: 10px; }
+.listdescription { display: flex; justify-content: center; height: 34px; padding-top: 10px; }
+.listfiller { height: 158px; }
+thead { color: #919191 !important; font-size: 20px; font-weight: bold; }
+thead a { color: #2699FB !important; text-decoration: none !important; }
+.pass { color: red; }
+.Diff10 { color: #6E0019; text-shadow: 2px 2px 22px #000000; }
+.chapter { color: #7F7F7F; font-size: 20px; font-weight: bold; padding: 12 !important; }
+td { color: #7F7F7F; font-size: 14px; padding: 6 12 !important; }

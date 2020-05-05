@@ -27,7 +27,7 @@ function error($message, $die) {
 </head>
 <body>
 	<!-- Content -->
-	<div class="container" style="height: 100vh">
+	<div class="container vh-100">
 		<!-- Navbar -->
 		<div class="row h-25 pt-4 align-items-top">
 			<?=$html->navbar?>
@@ -35,7 +35,7 @@ function error($message, $die) {
 		
 		<!-- Error -->
 		<div class="row h-50 align-items-center">
-			<div class="container mt-6">
+			<div class="container">
 				<div class="row d-flex justify-content-center">
 					<h1 class="text-center">Uh oh... Error!<br/>
 				</div>

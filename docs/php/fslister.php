@@ -82,13 +82,14 @@ class FSLister {
 	}
 	public function getHash($id): bool {
 		$this->hash = $this->database->readHash($id);
-		return !is_null($this->hash);
+		if(!is_null($this->hash)) $this->listID = $id;
+		return (!is_null($this->hash));
 	}
-	public function readHash($hash = null) {
+	public function readHash($hash = null): bool {
 		$hash = $hash ? $hash : $this->hash;
 		
 		//Check for errors
-		if(!$hash) error("Internal Error: No hash given.", true);
+		if(!$hash) { $this->fslist = null; return false; }
 		
 		//Reset the list
 		$this->hash   = $hash;
@@ -114,7 +115,7 @@ class FSLister {
 				//Register the song in the chapter
 				$this->fslist[$hashchapter][] = $song;
 			}
-		}
+		} return true;
 	}
 
 	private function createHash() {
