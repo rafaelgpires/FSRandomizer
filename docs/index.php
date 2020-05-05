@@ -36,14 +36,14 @@ if(isset($_GET['UniqueID'])) {
 //Parse input: Generate
 if(isset($_GET['generate'])) {
 	$list = new FSLister();
-	$list->createList();
 	
 	//Parse options
 	if(isset($_POST['options']))
 		foreach(json_decode($_POST['options']) as $key=>$value)
 			$list->$key = $value;
 	
-	//Output ID
+	//Create List and output ID
+	$list->createList();
 	echo json_encode($list->listID);
 	exit;
 }

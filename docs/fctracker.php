@@ -5,6 +5,33 @@
  * Dependencies:	$this->fslist should be set.
  */
  if(!$list->readHash()) error('FCTracker was loaded without a valid list.', true);
+ 
+ function tableChapter($chapter) { echo "<tr><td colspan=3 class=\"chapter\">$chapter</td></tr>\n"; }
+ function tableSong($songArr) {
+	//Check for encores
+	$song = preg_replace_callback("/^(\[(ENCORE)\] |\[(SUPER ENCORE)\] )/", function($encore){
+		global $songArr;
+		if(isset($encore[3])) {
+			//Super Encore, check for difficulty icon
+			if($songArr[0] >= 5) return '<img src="./images/diff_'.$songArr[0].'.png" class="diffIcon" /><b>Super Encore</b>: ';
+			else return '<b>Super Encore</b>: ';
+		} else return '<b>Encore</b>: '; //Encore
+	}, $songArr[1]); //No encore
+	
+	//Add difficulty colors
+	$diff = $songArr[0];
+	$diff = "<span class=\"Diff$diff\">$diff / 10</span>";
+	
+	//Set game
+	$game = $songArr[2];
+	echo <<<EOL
+<tr>
+	<td>$song</td>
+	<td>$diff</td>
+	<td>$game</td>
+</tr>
+EOL;
+ }
 ?>
 <html lang="en">
 <head>
@@ -56,56 +83,13 @@
 				<!-- List -->
 				<div class="row mx-auto" style="max-width: 932">
 					<table class="table table-borderless">
-						<tr><td colspan=6 class="chapter">Chapter 1</td></tr>
-						<tr>
-							<td>Song name</td>
-							<td>FC</td>
-							<td>Speed</td>
-							<td>Score</td>
-							<td>Difficulty</td>
-							<td>Game</td>
-						</tr>
-						<tr>
-							<td>Song name</td>
-							<td>FC</td>
-							<td>Speed</td>
-							<td>Score</td>
-							<td>Difficulty</td>
-							<td>Game</td>
-						</tr>
-						<tr>
-							<td>Song name</td>
-							<td>FC</td>
-							<td>Speed</td>
-							<td>Score</td>
-							<td>Difficulty</td>
-							<td>Game</td>
-						</tr>
-						<tr><td colspan=6>Chapter1</td></tr>
-						<tr>
-							<td>Song name</td>
-							<td>FC</td>
-							<td>Speed</td>
-							<td>Score</td>
-							<td>Difficulty</td>
-							<td>Game</td>
-						</tr>
-						<tr>
-							<td>Song name</td>
-							<td>FC</td>
-							<td>Speed</td>
-							<td>Score</td>
-							<td>Difficulty</td>
-							<td>Game</td>
-						</tr>
-						<tr>
-							<td>Song name</td>
-							<td>FC</td>
-							<td>Speed</td>
-							<td>Score</td>
-							<td>Difficulty</td>
-							<td>Game</td>
-						</tr>
+					<?php
+						foreach($list->fslist as $chapter=>$chsongs) {
+							tableChapter(('Chapter ' . (($chapter)+1)));
+							foreach($chsongs as $songArr)
+								tableSong($songArr);
+						}
+					?>
 					</table>
 				</div>
 			</div>

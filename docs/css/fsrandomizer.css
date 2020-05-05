@@ -34,6 +34,18 @@ form { margin-block-end: 0; }
 thead { color: #919191 !important; font-size: 20px; font-weight: bold; }
 thead a { color: #2699FB !important; text-decoration: none !important; }
 .pass { color: red; }
-.Diff10 { color: #6E0019; text-shadow: 2px 2px 22px #000000; }
 .chapter { color: #7F7F7F; font-size: 20px; font-weight: bold; padding: 12 !important; }
 td { color: #7F7F7F; font-size: 14px; padding: 6 12 !important; }
+
+/* FCTracker: Difficulty Colors */
+.diffIcon { width: 33px; height: 33px; margin: -6px 0 -6px -6px; }
+.Diff10 { color: #6e0019; text-shadow: 2px 2px 22px #000000; }
+.Diff9 { color: #a50026; }
+.Diff8 { color: #d73027; }
+.Diff7 { color: #f46d43; }
+.Diff6 { color: #fdae61; }
+.Diff5 { color: #ebd417; }
+.Diff4 { color: #abd9e9; }
+.Diff3 { color: #74add1; }
+.Diff2 { color: #4575b4; }
+.Diff1 { color: #313695; }
