@@ -92,7 +92,7 @@ function updateDescription() {
 }
 
 //Generator: Options - UI
-$("#options").click(function(){ updateDescription(); $("#optionsMenu").modal('show'); });
+$("#options").click(function(){ updateDescription(); updateInput(); $("#optionsMenu").modal('show'); });
 $("#reset").click(function() { $("#options").data({nsongs: 15, variance: 25, encore: 100, encorebonus: 10, superencore: 20, superencorebonus: 25, resetencores: false}); updateDescription(); updateInput(); }).click();
 $("#optionMenu").find('input').change(function(){
 	switch(this.id) {
