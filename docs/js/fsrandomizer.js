@@ -137,3 +137,30 @@ $("#submitpass").click(function() {
 		}
 	});
 });
+
+//Header: Click to Edit
+$("#listname").add("#listdesc").click(function(){
+	if(logged) {
+		$(this).hide(); 
+		$(($(this).data('show'))).show().focus();
+	} else $("#modalpass").modal('toggle');
+});
+
+//Header: Edit
+$("#inputName").add("#inputDesc").on('keypress', function(e){ if(e.which === 13) { e.preventDefault(); $(this).blur(); } }).focusout(function(){
+	//Parse
+	var value = $(this).val();
+	var limit = ($(this).attr('id') == 'inputName') ? 14 : 46;
+	if(value.length > 0 && value.length < limit && value.match(/^\w+([ -_]\w+)*$/)) {
+		console.log(1);
+		//It's valid, set it and update the DB
+		$.post('./?update', {UniqueID: ListID, name: $(this).data('name'), value: $(this).val()});
+		$(this).hide();
+		$(($(this).data('show'))).text($(this).val()).show();
+	} else {
+		console.log(2);
+		//It's not valid, ignore it and reset the value of the input before hiding it
+		$(this).val($(($(this).data('show'))).text()).hide();
+		$(($(this).data('show'))).show();
+	}
+});

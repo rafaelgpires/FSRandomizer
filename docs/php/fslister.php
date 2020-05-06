@@ -20,6 +20,7 @@ class FSLister {
 	public $hash;					//Output: Hash of the list
 	public $listID;					//Unique ID given to the created list
 	public $listName;				//Name gotten from the database for this list
+	public $listDesc;				//Description gotten from the database for this list
 	
 	#Methods
 	public function __construct() {
@@ -81,12 +82,21 @@ class FSLister {
 		$this->createHash();
 		$this->storeList();
 	}
-	public function getHash($id): bool {
-		$this->hash = $this->database->readHash($id);
-		if(!is_null($this->hash)) {
+	public function getList($id):bool {
+		$list = $this->database->readList($id);
+		if(!is_null($list)) {
+			$this->hash	= $list[0];
 			$this->listID   = $id;
-			$this->listName = $this->database->getName($id);
-		} return (!is_null($this->hash));
+			$this->listName = $list[2];
+			$this->listDesc = $list[3];
+			return true;
+		} else {
+			$this->hash	= null;
+			$this->listID   = null;
+			$this->listName = null;
+			$this->listDesc = null;
+			return false;
+		}
 	}
 	public function readHash($hash = null): bool {
 		$hash = $hash ? $hash : $this->hash;
@@ -141,9 +151,11 @@ class FSLister {
 		$this->hash = substr($this->hash, 1);
 	}
 	private function storeList() {
-		$this->listID   = uniqid(); //Create a unique ID for the list
-		$this->listName = $this->listID; //Default name is always the ID
-		if(!$this->database->storeHash($this->listID, $this->hash))
+		$this->listID   = uniqid();				//Create a unique ID for the list
+		$this->listName = $this->listID;			//Default name is always the ID
+		$this->listDesc = "Full Series List";			//Default description
+		$pass = bin2hex(openssl_random_pseudo_bytes(2));	//Random password
+		if(!$this->database->storeList($this->listID, $this->hash, $pass, $this->listName, $this->listDesc))
 			error("Internal error: Couldn't save your list.", true);
 	}
 	private function findSongKey($songarr) {

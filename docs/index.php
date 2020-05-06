@@ -17,8 +17,8 @@ if(isset($_SESSION['logged']) && isset($_SESSION['name']))
 //Parse input: UniqueID
 if(isset($_GET['UniqueID'])) {
 	//UniqueID is given, check validity before continuing
-	$list = new FSLister();
-	$success = $list->getHash($_GET['UniqueID']);
+	$list    = new FSLister();
+	$success = $list->getList($_GET['UniqueID']);
 	
 	//Parse other options
 	if(isset($_GET['output'])) {
@@ -29,10 +29,10 @@ if(isset($_GET['UniqueID'])) {
 			case 'validate': echo json_encode($success); break;
 			case 'validatepass':
 				if(!isset($_GET['pass'])) error('Login attempt without password.');
-				$login = $database->login($_GET['UniqueID'], $_GET['pass']);
+				$login = $database->login($list->listID, $_GET['pass']);
 				if($login) { 
-					$_SESSION['logged'] = $_GET['UniqueID']; 
-					$_SESSION['name'] = $database->getName($_GET['UniqueID']); 
+					$_SESSION['logged'] = $list->listID; 
+					$_SESSION['name']   = $list->listName; 
 				} echo json_encode($login);
 				break;
 			default: error("No valid output type given.", true);
@@ -49,13 +49,39 @@ if(isset($_GET['generate'])) {
 	//Parse options
 	if(isset($_POST['options']))
 		foreach(json_decode($_POST['options']) as $key=>$value)
-			$list->$key = $value;
+			if(in_array($key, array('nsongs', 'variance', 'encore', 'encorebonus', 'superencore', 'superencorebonus', 'resetencores')))
+				$list->$key = intval($value);
 	
 	//Create List, Login and output ID
 	$list->createList();
 	$_SESSION['logged'] = $list->listID;
 	$_SESSION['name']   = $list->listName;
 	echo json_encode($list->listID);
+	exit;
+}
+
+//Parse input: Update
+if(isset($_GET['update'])) {
+	//Check if it's a valid request
+	if(!$logged) 						error('You\'re not logged in.', true);
+	if(!isset($_POST['UniqueID'])) 				error('You didn\'t tell me which list you wanna edit.', true);
+	if($logged[0] != $_POST['UniqueID']) 			error('You\'re not logged in the list you want to edit.', true);
+	if(!isset($_POST['name']) || !isset($_POST['value'])) 	error('Error: Don\'t know what you want to update.', true);
+	if(!in_array($_POST['name'], array('name', 'desc'))) 	error('Value name doesn\'t exist.', true);
+
+	//Create list
+	$list    = new FSLister();
+	if(!$list->getList($_POST['UniqueID'])) 		error('Invalid list ID on update request.', true);
+
+	//Parse it
+	$value = trim($_POST['value']);
+	$name  = trim($_POST['name']);
+	$limit = ($name == 'name') ? 13 : 45;
+	if(strlen($value) > $limit || strlen($value) < 1)	error("$name is above the character limit.", true);
+	if(!preg_match('/^\w+([ -_]\w+)*$/', $value))		error("Invalid $name given.", true);
+	
+	//Update database
+	$database->update($name, $value, $list->listID);
 	exit;
 }
 

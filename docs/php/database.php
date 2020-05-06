@@ -12,42 +12,26 @@ class SQLConn {
 		if($this->mysqli->connect_errno)
 			error("Couldn't connect to database.", true);
 	}
+	public function storeList($id   , $hash, $pass, $name, $desc):bool   { return $this->insert_query(array('id' => $id, 'hash' => $hash, 'pass' => $pass, 'name' => $name, 'desc' => $desc), 'lists'); }
+	public function readList ($id                               ):?array { return $this->selectID_query('`hash`, `pass`, `name`, `desc`', 'lists', $id, false); }
+	public function login    ($id   , $pass                     ):bool   { return ($pass == $this->selectID_query('pass', 'lists', $id)); }
+	public function update   ($col  , $val , $id                ):bool   { return $this->mysqli->query("UPDATE lists SET `$col`='".$this->mysqli->real_escape_string($val)."' WHERE id='$id'"); }
 	
-	public function readHash($id):?string {
-		$id    = $this->mysqli->real_escape_string($id);
-		$query = $this->mysqli->query("SELECT hash FROM lists WHERE id='$id'");
-		$hash  = $query ? $query->fetch_row() : false;
-		if($query) $query->free();
+	private function insert_query($options, $table) {
+		foreach($options as $key=>$value)
+			$options[$key] = $this->mysqli->real_escape_string($value);
 		
-		return $hash ? $hash[0] : null;
+		$optionkeys = '`' . join('`, `', array_keys($options)) . '`';
+		$optionvals = '\'' . join('\', \'', $options) . '\'';
+		return $this->mysqli->query("INSERT INTO $table ($optionkeys) VALUES ($optionvals)");
 	}
-	
-	public function storeHash($id, $hash):bool {
-		$id   = $this->mysqli->real_escape_string($id);
-		$hash = $this->mysqli->real_escape_string($hash);
-		$pass = bin2hex(openssl_random_pseudo_bytes(2));
-		$name = $id;
-		
-		return $this->mysqli->query("INSERT INTO lists(id,hash,pass,name) VALUES ('$id','$hash','$pass','$name')");
-	}
-	
-	public function login($id, $pass):bool {
+	private function selectID_query($option, $table, $id, $first=true) {
 		$id     = $this->mysqli->real_escape_string($id);
-		$pass   = $this->mysqli->real_escape_string($pass);
-		$query  = $this->mysqli->query("SELECT pass FROM lists WHERE id='$id'");
-		$dbpass = $query ? $query->fetch_row() : false;
+		$query  = $this->mysqli->query("SELECT $option FROM $table WHERE id='$id'");
+		$result = $query ? $query->fetch_row() : false;
 		if($query) $query->free();
 		
-		return $dbpass ? ($pass == $dbpass[0]) : false;
-	}
-	
-	public function getName($id):string {
-		$id    = $this->mysqli->real_escape_string($id);
-		$query = $this->mysqli->query("SELECT name FROM lists WHERE id='$id'");
-		$name  = $query ? $query->fetch_row() : false;
-		if($query) $query->free();
-		
-		return $name ? $name[0] : '[]';
+		return $result ? ($first ? $result[0] : $result) : null;
 	}
 }
 ?>

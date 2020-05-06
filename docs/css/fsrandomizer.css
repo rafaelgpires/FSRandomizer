@@ -27,6 +27,8 @@ form { margin-block-end: 0; }
 .listheader img { width: 100px; height: 100px; }
 .listheader h1 { margin: 0; font-size: 40px; font-weight: bold; font-family: 'Georgia'; color: #7F7F7F; }
 .listheader h2 { margin: 0; font-size: 20px; color: #7F7F7F; }
+.listname { border: none transparent; outline: none; padding: 0; margin: 0; width: 321px; height: 48px; font-size: 40px; font-weight: bold; font-family: 'Georgia'; color: #7F7F7F; text-align:center; display: none;  }
+.listdesc { border: none transparent; outline: none; padding: 0; margin: 0; height: 24px; font-size: 20px; color: #7F7F7F; text-align: center; display: none; }
 .listicon { display: flex; justify-content: center; height: 100px; }
 .listtitle { display: flex; justify-content: center; height: 58px; padding-top: 10px; }
 .listdescription { display: flex; justify-content: center; height: 34px; padding-top: 10px; }

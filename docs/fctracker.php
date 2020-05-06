@@ -84,10 +84,12 @@ EOL;
 							<img src="./images/diff_10.png" />
 						</div>
 						<div class="row listtitle">
-							<h1><?=$list->listName?></h1>
+							<h1 id="listname" data-show="#inputName"><?=$list->listName?></h1>
+							<input ="text" class="listname" value="<?=$list->listName?>" id="inputName" data-show="#listname" data-name="name" maxlength=13 />
 						</div>
 						<div class="row listdescription">
-							<h2>Full Series List</h2>
+							<h2 id="listdesc" data-show="#inputDesc"><?=$list->listDesc?></h2>
+							<input ="text" class="listdesc" value="<?=$list->listDesc?>" id="inputDesc" data-show="#listdesc" data-name="desc" maxlength=45 />
 						</div>
 						<div class="row listfiller">&nbsp;</div>
 					</div>
