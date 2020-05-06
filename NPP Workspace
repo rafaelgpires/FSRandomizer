@@ -5,6 +5,8 @@
         </Folder>
         <Folder name="html">
             <File name="docs\html\navbar.html" />
+            <File name="docs\html\links.html" />
+            <File name="docs\html\styles.html" />
         </Folder>
         <Folder name="includes">
             <File name="docs\includes\func_notepadTable.php" />
