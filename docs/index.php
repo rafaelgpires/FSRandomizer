@@ -5,16 +5,14 @@ require("includes/func_notepadTable.php");
 require("php/database.php");
 require("php/fslister.php");
 require("php/error.php");
+require("php/html.php");
+$database = new SQLConn();
+$html     = new HTML();
 
-//HTML Object
-class HTML {
-	public $navbar, $scripts, $metalinks;
-	public function __construct($dir) {
-		$this->navbar = file_get_contents($dir . '/navbar.html');
-		$this->styles = file_get_contents($dir . '/styles.html');
-		$this->links  = file_get_contents($dir . '/links.html');
-	}
-} $html = new HTML('./html');
+//Check session
+$logged = false;
+if(isset($_SESSION['logged']) && isset($_SESSION['name']))
+	$logged = array($_SESSION['logged'], $_SESSION['name']);
 
 //Parse input: UniqueID
 if(isset($_GET['UniqueID'])) {
@@ -27,11 +25,20 @@ if(isset($_GET['UniqueID'])) {
 		//Output has been requested
 		switch($_GET['output']) {
 			case 'hash': echo $list->hash; break; //Empty output if Invalid ID
+			case 'logout': unset($_SESSION['logged'], $_SESSION['name']); //Empty output
 			case 'validate': echo json_encode($success); break;
+			case 'validatepass':
+				if(!isset($_GET['pass'])) error('Login attempt without password.');
+				$login = $database->login($_GET['UniqueID'], $_GET['pass']);
+				if($login) { 
+					$_SESSION['logged'] = $_GET['UniqueID']; 
+					$_SESSION['name'] = $database->getName($_GET['UniqueID']); 
+				} echo json_encode($login);
+				break;
 			default: error("No valid output type given.", true);
 		}
 	} elseif($success) require("fctracker.php"); //UniqueID is valid and there's no output request, load fctracker.php
-	else error('Invalid list ID!', true); //UniqueID is invalid and there's no output request, show error.
+	else error('Invalid list ID!', true); //UniqueID is invalid and there's no output request, show error
 	exit;
 }
 
@@ -44,8 +51,10 @@ if(isset($_GET['generate'])) {
 		foreach(json_decode($_POST['options']) as $key=>$value)
 			$list->$key = $value;
 	
-	//Create List and output ID
+	//Create List, Login and output ID
 	$list->createList();
+	$_SESSION['logged'] = $list->listID;
+	$_SESSION['name']   = $list->listName;
 	echo json_encode($list->listID);
 	exit;
 }
@@ -94,7 +103,7 @@ if(isset($_GET['http_error'])) {
 				</div>
 				<div class="row mt-4 d-flex justify-content-center">
 					<a class="options" id="options"></a>
-					<div class="modal fade" id="optionsMenu">
+					<div class="modal fade" tab-index="-1" id="optionsMenu">
 						<div class="modal-dialog modal-dialog-centered modal-sm" role="document">
 							<div class="modal-content">
 								<div class="modal-header"><h5 class="modal-title w-100 text-center">OPTIONS</h5></div>

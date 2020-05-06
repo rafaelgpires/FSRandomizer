@@ -49,3 +49,7 @@ td { color: #7F7F7F; font-size: 14px; padding: 6 12 !important; }
 .Diff3 { color: #74add1; }
 .Diff2 { color: #4575b4; }
 .Diff1 { color: #313695; }
+
+/* FCTracker: Password */
+.passinput { width: 166px !important; }
+.modalpass { max-width: 200px !important; }

@@ -19,6 +19,7 @@ class FSLister {
 	public $fslist;					//Output: Array list
 	public $hash;					//Output: Hash of the list
 	public $listID;					//Unique ID given to the created list
+	public $listName;				//Name gotten from the database for this list
 	
 	#Methods
 	public function __construct() {
@@ -82,8 +83,10 @@ class FSLister {
 	}
 	public function getHash($id): bool {
 		$this->hash = $this->database->readHash($id);
-		if(!is_null($this->hash)) $this->listID = $id;
-		return (!is_null($this->hash));
+		if(!is_null($this->hash)) {
+			$this->listID   = $id;
+			$this->listName = $this->database->getName($id);
+		} return (!is_null($this->hash));
 	}
 	public function readHash($hash = null): bool {
 		$hash = $hash ? $hash : $this->hash;
@@ -138,8 +141,10 @@ class FSLister {
 		$this->hash = substr($this->hash, 1);
 	}
 	private function storeList() {
-		$this->listID = uniqid(); //Create a unique ID for the list
-		$this->database->storeHash($this->listID, $this->hash);
+		$this->listID   = uniqid(); //Create a unique ID for the list
+		$this->listName = $this->listID; //Default name is always the ID
+		if(!$this->database->storeHash($this->listID, $this->hash))
+			error("Internal error: Couldn't save your list.", true);
 	}
 	private function findSongKey($songarr) {
 		foreach($this->songlist as $key=>$song) {

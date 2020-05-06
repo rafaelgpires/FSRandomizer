@@ -4,10 +4,12 @@
  * Description:		This page shows the $list->fslist and allows the user to interact with it.
  * Dependencies:	$this->fslist should be set.
  */
- if(!$list->readHash()) error('FCTracker was loaded without a valid list.', true);
- 
- function tableChapter($chapter) { echo "<tr><td colspan=3 class=\"chapter\">$chapter</td></tr>\n"; }
- function tableSong($songArr) {
+//Check for dependencies
+if(!$list->readHash()) error('FCTracker was loaded without a valid list.', true);
+
+//List functions
+function tableChapter($chapter) { echo "<tr><td colspan=3 class=\"chapter\">$chapter</td></tr>\n"; }
+function tableSong($songArr) {
 	//Check for encores
 	$song = preg_replace_callback("/^(\[(ENCORE)\] |\[(SUPER ENCORE)\] )/", function($encore){
 		global $songArr;
@@ -31,7 +33,7 @@
 	<td>$game</td>
 </tr>
 EOL;
- }
+}
 ?>
 <html lang="en">
 <head>
@@ -39,8 +41,32 @@ EOL;
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<?=$html->styles?>
 	<title>FSRandomizer - FC Tracker</title>
+	<script>var ListID="<?=$list->listID?>";</script>
+	<script>var logged=<?=json_encode($logged)?>;</script>
 </head>
 <body>
+	<!-- Password Modal -->
+	<div class="modal fade" tabindex="-1" id="modalpass">
+		<div class="modal-dialog modal-dialog-centered modal-sm modalpass">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">List Password</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form class="form-inline">
+						<input type="text" class="form-control passinput" placeholder="Password" id="passinput" />
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary" id="submitpass">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<!-- Content -->
 	<div class="container vh-100">
 		<!-- Navbar -->
@@ -58,8 +84,7 @@ EOL;
 							<img src="./images/diff_10.png" />
 						</div>
 						<div class="row listtitle">
-							<h1><?=$list->listID?></h1>
-							
+							<h1><?=$list->listName?></h1>
 						</div>
 						<div class="row listdescription">
 							<h2>Full Series List</h2>
@@ -71,8 +96,7 @@ EOL;
 				<!-- Alerts -->
 				<div class="row mx-auto" style="max-width: 932">
 					<table class="table m-0">
-						<!-- Alerts -->
-						<thead><th colspan=4>Your password is: <span class="pass">AlGh123123</span> - Save it, this is the last time you will see it.</th></thead>
+						<thead><th colspan=4>Your password is: <span class="pass">AlGh123123</span> - Save it, this is the last time you'll see it.</th></thead>
 						<thead><th colspan=4>Your FC Tracker is disabled. Click <a href="#">here</a> to enable it.</th></thead>
 						<thead class="text-center"><th>Stats</th><th>20 / 660 FCs</th><th>235% Avg. Speed</th><th>14,304,432 Acc. Score</th></thead>
 						<thead class="text-center"><th>Stats</th><th class="Diff10">660 / 660 FCs</th><th>Speed <a href="#">disabled</a></th><th>Score <a href="#">disabled</a></th></thead>

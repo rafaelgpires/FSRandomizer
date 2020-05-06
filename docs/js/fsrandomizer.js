@@ -9,10 +9,6 @@ function setAlert(id, message=null, type=null) {
 	}
 }
 
-/* Landing Page
- * No need to run a check on whether we're on the landing page, since jQuery does that check for us
- * the code will simply not run if the elements don't exist without throwing any errors
- */
 //NavBar: Input ID
 $("#InputIDForm").submit(function(){
 	//Check validity of the ID
@@ -34,6 +30,10 @@ $("#InputIDForm").submit(function(){
 	return continueSubmit;
 });
 
+/* Landing Page
+ * No need to run a check on whether we're on the landing page, since jQuery does that check for us
+ * the code will simply not run if the elements don't exist without throwing any errors
+ */
 //Generator: Button
 $("#generator").click(function(){
 	//Let the user know it's loading
@@ -102,4 +102,38 @@ $("#optionMenu").find('input').change(function(){
 		case 'encorebonus': case 'superencorebonus': validateOption(this, (validatePercentage(this.value) && validateVarianceSum(this.value, 'variance'))); break;
 		case 'resetencores': $("#options").data('resetencores', $(this).prop('checked')); updateDescription(); break;
 	}
+});
+
+/* FCTracker */
+//Logout
+try {
+	if(logged) {
+		$("#modalpass").remove();
+		$(".navbar-brand").attr('href', '#logout').click(function(){
+			$.ajax({
+				url: "./",
+				data: {UniqueID: ListID, output: "logout"},
+				async: false,
+			}); window.location = './';
+		}).children("span").text(logged[1]);
+	}
+} catch {}
+
+//Password modal
+$("#modalpass").on('shown.bs.modal', function() { $("#passinput").focus().removeClass("is-invalid"); });
+$("#passinput").on('keypress', function(e){ if(e.which === 13) { $("#submitpass").click(); e.preventDefault(); } });
+$("#submitpass").click(function() {
+	$.ajax({
+		url: "./",
+		dataType: "json",
+		data: {UniqueID: ListID, output: "validatepass", pass: $("#passinput").val()},
+		async: false,
+		success: function(data) {
+			if(!data) $("#passinput").removeClass("is-valid").addClass("is-invalid");
+			else { 
+				$("#passinput").removeClass("is-invalid").addClass("is-valid");
+				location.reload();
+			}
+		}
+	});
 });
