@@ -17,10 +17,12 @@ class FSLister {
 	private $songlist;				//For interpreting breakdown.txt
 
 	public $fslist;					//Output: Array list
-	public $hash;					//Output: Hash of the list
-	public $listID;					//Unique ID given to the created list
-	public $listName;				//Name gotten from the database for this list
-	public $listDesc;				//Description gotten from the database for this list
+	public $listHash;				//Var: Hash
+	public $listID;					//Var: Unique ID
+	public $listName;				//Var: Name
+	public $listDesc;				//Var: Description
+	public $listPass;				//Var: Password
+	public $listVisits;				//Var: Visits counter
 	
 	#Methods
 	public function __construct() {
@@ -85,27 +87,31 @@ class FSLister {
 	public function getList($id):bool {
 		$list = $this->database->readList($id);
 		if(!is_null($list)) {
-			$this->hash	= $list[0];
-			$this->listID   = $id;
-			$this->listName = $list[2];
-			$this->listDesc = $list[3];
+			$this->listID     = $id;
+			$this->listHash	  = $list[0];
+			$this->listPass   = $list[1];
+			$this->listName   = $list[2];
+			$this->listDesc   = $list[3];
+			$this->listVisits = $list[4];
 			return true;
 		} else {
-			$this->hash	= null;
-			$this->listID   = null;
-			$this->listName = null;
-			$this->listDesc = null;
+			$this->listID     = null;
+			$this->listPass   = null;
+			$this->listHash	  = null;
+			$this->listName   = null;
+			$this->listDesc   = null;
+			$this->listVisits = null;
 			return false;
 		}
 	}
 	public function readHash($hash = null): bool {
-		$hash = $hash ? $hash : $this->hash;
+		$hash = $hash ? $hash : $this->listHash;
 		
 		//Check for errors
 		if(!$hash) { $this->fslist = null; return false; }
 		
 		//Reset the list
-		$this->hash   = $hash;
+		$this->listHash   = $hash;
 		$this->fslist = array();
 		
 		//Read the hash by chapters
@@ -132,10 +138,10 @@ class FSLister {
 	}
 
 	private function createHash() {
-		$this->hash = ''; //Reset hash
+		$this->listHash = ''; //Reset hash
 		
 		foreach($this->fslist as $chapter) {
-			$this->hash .= '|'; //Write chapter separator
+			$this->listHash .= '|'; //Write chapter separator
 			foreach($chapter as $song) {
 				//Check for encores
 				$match = preg_match('/^(\[ENCORE\] )|(\[SUPER ENCORE\] )/', $song[1], $encore);
@@ -143,19 +149,19 @@ class FSLister {
 				else $encore = 0;
 				
 				//Write the hash for the song
-				$this->hash .= $encore . str_pad($song[3], 3, 0, STR_PAD_LEFT);
+				$this->listHash .= $encore . str_pad($song[3], 3, 0, STR_PAD_LEFT);
 			}
 		}
 		
 		//Store hash
-		$this->hash = substr($this->hash, 1);
+		$this->listHash = substr($this->listHash, 1);
 	}
 	private function storeList() {
-		$this->listID   = uniqid();				//Create a unique ID for the list
-		$this->listName = $this->listID;			//Default name is always the ID
-		$this->listDesc = "Full Series List";			//Default description
-		$pass = bin2hex(openssl_random_pseudo_bytes(2));	//Random password
-		if(!$this->database->storeList($this->listID, $this->hash, $pass, $this->listName, $this->listDesc))
+		$this->listID   = uniqid();					//Create a unique ID for the list
+		$this->listName = $this->listID;				//Default name is always the ID
+		$this->listDesc = "Full Series List";				//Default description
+		$this->listPass = bin2hex(openssl_random_pseudo_bytes(2));	//Random password
+		if(!$this->database->storeList($this->listID, $this->listHash, $this->listPass, $this->listName, $this->listDesc))
 			error("Internal error: Couldn't save your list.", true);
 	}
 	private function findSongKey($songarr) {

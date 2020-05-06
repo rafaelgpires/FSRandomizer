@@ -24,7 +24,7 @@ if(isset($_GET['UniqueID'])) {
 	if(isset($_GET['output'])) {
 		//Output has been requested
 		switch($_GET['output']) {
-			case 'hash': echo $list->hash; break; //Empty output if Invalid ID
+			case 'hash': echo $list->listHash; break; //Empty output if Invalid ID
 			case 'logout': unset($_SESSION['logged'], $_SESSION['name']); //Empty output
 			case 'validate': echo json_encode($success); break;
 			case 'validatepass':

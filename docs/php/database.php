@@ -12,10 +12,11 @@ class SQLConn {
 		if($this->mysqli->connect_errno)
 			error("Couldn't connect to database.", true);
 	}
-	public function storeList($id   , $hash, $pass, $name, $desc):bool   { return $this->insert_query(array('id' => $id, 'hash' => $hash, 'pass' => $pass, 'name' => $name, 'desc' => $desc), 'lists'); }
-	public function readList ($id                               ):?array { return $this->selectID_query('`hash`, `pass`, `name`, `desc`', 'lists', $id, false); }
+	public function storeList($id   , $hash, $pass, $name, $desc):bool   { return $this->insert_query(array('id' => $id, 'hash' => $hash, 'pass' => $pass, 'name' => $name, 'desc' => $desc, 'visits' => 0), 'lists'); }
+	public function readList ($id                               ):?array { return $this->selectID_query('`hash`, `pass`, `name`, `desc`, `visits`', 'lists', $id, false); }
 	public function login    ($id   , $pass                     ):bool   { return ($pass == $this->selectID_query('pass', 'lists', $id)); }
 	public function update   ($col  , $val , $id                ):bool   { return $this->mysqli->query("UPDATE lists SET `$col`='".$this->mysqli->real_escape_string($val)."' WHERE id='$id'"); }
+	public function visitInc ($id   , $val                      ):bool   { return $this->mysqli->query("UPDATE lists SET `visits`=$val WHERE id='$id'"); }
 	
 	private function insert_query($options, $table) {
 		foreach($options as $key=>$value)

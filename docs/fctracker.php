@@ -7,6 +7,9 @@
 //Check for dependencies
 if(!$list->readHash()) error('FCTracker was loaded without a valid list.', true);
 
+//Update visits counter
+$database->visitInc($list->listID, ++$list->listVisits);
+
 //List functions
 function tableChapter($chapter) { echo "<tr><td colspan=3 class=\"chapter\">$chapter</td></tr>\n"; }
 function tableSong($songArr) {
@@ -96,9 +99,9 @@ EOL;
 				</div>
 				
 				<!-- Alerts -->
-				<div class="row mx-auto" style="max-width: 932">
+				<div class="row mx-auto listalerts">
 					<table class="table m-0">
-						<thead><th colspan=4>Your password is: <span class="pass">AlGh123123</span> - Save it, this is the last time you'll see it.</th></thead>
+						<?php if($list->listVisits == 1) { ?> <thead><th colspan=4 class="passalert">Your password is: <span class="pass"><?=$list->listPass?></span> - Save it, this is the last time you'll see it.</th></thead> <?php } ?>
 						<thead><th colspan=4>Your FC Tracker is disabled. Click <a href="#">here</a> to enable it.</th></thead>
 						<thead class="text-center"><th>Stats</th><th>20 / 660 FCs</th><th>235% Avg. Speed</th><th>14,304,432 Acc. Score</th></thead>
 						<thead class="text-center"><th>Stats</th><th class="Diff10">660 / 660 FCs</th><th>Speed <a href="#">disabled</a></th><th>Score <a href="#">disabled</a></th></thead>
@@ -106,7 +109,7 @@ EOL;
 				</div>
 				
 				<!-- List -->
-				<div class="row mx-auto" style="max-width: 932">
+				<div class="row mx-auto listsongs">
 					<table class="table table-borderless">
 					<?php
 						foreach($list->fslist as $chapter=>$chsongs) {
