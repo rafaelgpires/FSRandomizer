@@ -12,7 +12,7 @@ class FSLister {
 	public $superencorebonus	= 25;		//Intended % of RNG added to variance for much harder encores
 	public $resetencores		= false;	//Whether to reset encores during each encore song
 
-	private $database;				//Instance of /SQL/SQLConn
+	private $database;				//Instance of SQLConn
 	private $breakdown;				//For reading breakdown.txt
 	private $songlist;				//For interpreting breakdown.txt
 
@@ -23,6 +23,7 @@ class FSLister {
 	public $listDesc;				//Var: Description
 	public $listPass;				//Var: Password
 	public $listVisits;				//Var: Visits counter
+	public $listFCs;				//Ext Var: FC Array from DB
 	
 	#Methods
 	public function __construct() {

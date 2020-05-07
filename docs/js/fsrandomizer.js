@@ -1,3 +1,6 @@
+/* Global
+ ****************************************************************************************************
+ */
 //Alerts
 function setAlert(id, message=null, type=null) {
 	if(!message) { $('#'+id).hide(); }
@@ -33,6 +36,7 @@ $("#InputIDForm").submit(function(){
 /* Landing Page
  * No need to run a check on whether we're on the landing page, since jQuery does that check for us
  * the code will simply not run if the elements don't exist without throwing any errors
+ ****************************************************************************************************
  */
 //Generator: Button
 $("#generator").click(function(){
@@ -104,9 +108,12 @@ $("#optionMenu").find('input').change(function(){
 	}
 });
 
-/* FCTracker */
+/* FCTracker
+ ***************************************************************************************************
+ */
 //Logout
 try {
+	//Probably wanna do this server-side instead
 	if(logged) {
 		$("#modalpass").remove();
 		$(".navbar-brand").attr('href', '#logout').click(function(){
@@ -138,15 +145,13 @@ $("#submitpass").click(function() {
 	});
 });
 
-//Header: Click to Edit
+//Header: Edit Title/Description
 $("#listname").add("#listdesc").click(function(){
 	if(logged) {
 		$(this).hide(); 
 		$(($(this).data('show'))).show().focus();
 	} else $("#modalpass").modal('toggle');
 });
-
-//Header: Edit
 $("#inputName").add("#inputDesc").on('keypress', function(e){ if(e.which === 13) { e.preventDefault(); $(this).blur(); } }).focusout(function(){
 	//Parse
 	var value = $(this).val();
@@ -164,3 +169,44 @@ $("#inputName").add("#inputDesc").on('keypress', function(e){ if(e.which === 13)
 		$(($(this).data('show'))).show();
 	}
 });
+
+//FC Tracker Enable/Disable
+function toggleFCTracker(val) {
+	if(logged) {
+		$.ajax({
+			url: './?update',
+			type: 'POST',
+			data: {UniqueID: ListID, name: 'fctracker', value: val},
+			async: false,
+		}); location.reload();
+	} else $("#modalpass").modal('toggle');
+}
+$("#enable_tracker").click(function(){ toggleFCTracker(1); });
+$("#disable_tracker").click(function(){ toggleFCTracker(0); });
+
+//FC Mark FCs
+$(".NoFC").click(function() { updateFC(this, true); });
+$(".FC").click(function() { updateFC(this, false); });
+function updateFC(DOM, fc) {
+	if(logged) {
+		//Update FC count
+		var fcname    = fc ? 'FC' : 'NoFC';
+		var fccount   = parseInt($("#fccount").text());
+		var songcount = $(DOM).data('count');
+		$(DOM).off('click').click(function() { updateFC(this, !fc); });
+		$(DOM).attr('class', fcname);
+		fccount = fc ? (fccount + 1) : (fccount - 1);
+		$("#fccount").text(fccount);
+
+		//Update database
+		$.post('./?update', {UniqueID: ListID, name: fcname, value: songcount});
+		
+		//Update difficulty color
+		var difficulty = 0;
+		for (const [key, value] of Object.entries(fcs2diff))
+			if(fccount >= key)
+				difficulty = value;
+			
+		$("#fccount").parent().attr('class', ("Diff" + difficulty));
+	} else $("#modalpass").modal('toggle');
+}

@@ -63,22 +63,49 @@ if(isset($_GET['generate'])) {
 //Parse input: Update
 if(isset($_GET['update'])) {
 	//Check if it's a valid request
-	if(!$logged) 						error('You\'re not logged in.', true);
-	if(!isset($_POST['UniqueID'])) 				error('You didn\'t tell me which list you wanna edit.', true);
-	if($logged[0] != $_POST['UniqueID']) 			error('You\'re not logged in the list you want to edit.', true);
-	if(!isset($_POST['name']) || !isset($_POST['value'])) 	error('Error: Don\'t know what you want to update.', true);
-	if(!in_array($_POST['name'], array('name', 'desc'))) 	error('Value name doesn\'t exist.', true);
-
-	//Create list
+	if(!$logged) 							error('You\'re not logged in.', true);
+	if(!isset($_POST['UniqueID'])) 					error('You didn\'t tell me which list you wanna edit.', true);
+	if($logged[0] != $_POST['UniqueID']) 				error('You\'re not logged in the list you want to edit.', true);
+	if(!isset($_POST['name']) || !isset($_POST['value'])) 		error('Error: Don\'t know what you want to update.', true);
+	
+	//Get list
 	$list    = new FSLister();
-	if(!$list->getList($_POST['UniqueID'])) 		error('Invalid list ID on update request.', true);
-
-	//Parse it
+	if(!$list->getList($_POST['UniqueID'])) 			error('Invalid list ID on update request.', true);
+	
+	//Parse input
 	$value = trim($_POST['value']);
 	$name  = trim($_POST['name']);
-	$limit = ($name == 'name') ? 13 : 45;
-	if(strlen($value) > $limit || strlen($value) < 1)	error("$name is above the character limit.", true);
-	if(!preg_match('/^\w+([ -_]\w+)*$/', $value))		error("Invalid $name given.", true);
+	switch($name) {
+		case 'name':
+			if(strlen($value) > 13 || strlen($value) < 1) 	error('Name is not within the character limit (1-13).', true);
+			if(!preg_match('/^\w+([ -_]\w+)*$/', $value)) 	error('Name is invalid (alphanumerical only with spaces/hypens/underscores)', true);
+			break;
+			
+		case 'desc':
+			if(strlen($value) > 45 || strlen($value) < 1) 	error('Description is not within the charater limit (1-45).', true);
+			if(!preg_match('/^\w+([ -_]\w+)*$/', $value)) 	error('Description is invalid (alphanumerical only with spaces/hypens/underscores)', true);
+			break;
+			
+		case 'fctracker':
+			if($value != 0 && $value != 1)			error('Invalid value for FCTracker!', true);
+			break;
+			
+		case 'FC': $FC = true;
+		case 'NoFC':
+			if(!isset($FC)) $FC = false;
+			$value = intval($value);
+			if(!$value)					error('Invalid value for FC!', true);
+			if($value < 1 || $value > 660)			error('Invalid value range for FC!', true);
+			$fcvars = $database->fcRead($logged[0]);
+			if(!$fcvars['fctracker'])			error('FC Tracker isn\'t enabled in this list.', true);
+			if(!$fcvars['fchash'])				error('FC Hash hasn\'t been created for this list.', true);
+			$name  = 'fchash';
+			$value = substr_replace($fcvars['fchash'], ($FC ? '1' : '0'), ($value-1), 1);
+			break;
+			
+		default:
+									error('Unrecognised value name.', true);
+	}
 	
 	//Update database
 	$database->update($name, $value, $list->listID);

@@ -38,9 +38,15 @@ thead { color: #919191 !important; font-size: 20px; font-weight: bold; }
 thead a { color: #2699FB !important; text-decoration: none !important; }
 .pass { color: red; }
 .passalert { background-color: #f8d7da; border: 1px solid transparent; border-radius: 4px; }
+.thlink { cursor: pointer; }
+
+/* FCTracker: List */
 .listsongs { max-width: 932px; }
 .chapter { color: #7F7F7F; font-size: 20px; font-weight: bold; padding: 12 !important; }
 td { color: #7F7F7F; font-size: 14px; padding: 6 12 !important; }
+.NoFC:hover {  background: url('../images/fc.png') 74px 0; }
+.NoFC { cursor: pointer; display: block; margin: -5px 0; height: 26px; width: 37px; background: url('../images/fc.png') 0 0; }
+.FC { cursor: pointer; display: block; margin: -5px 0; height: 26px; width: 37px; background: url('../images/fc.png') 37px 0; }
 
 /* FCTracker: Difficulty Colors */
 .diffIcon { width: 33px; height: 33px; margin: -6px 0 -6px -6px; }
