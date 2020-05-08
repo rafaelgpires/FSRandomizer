@@ -59,8 +59,8 @@ class FSLister {
 				
 				//Encores have a chance for increased difficulty
 				if($x >= ($this->nsongs - floor($this->nsongs/5))) {
-					if($this->encore)      if(rand(1, ($this->encore      /100)) == 1) $incdiff      = true;
-					if($this->superencore) if(rand(1, ($this->superencore /100)) == 1) $superincdiff = true;
+					if($this->encore)      if(rand(1, (100 / $this->encore     )) == 1) $incdiff      = true;
+					if($this->superencore) if(rand(1, (100 / $this->superencore)) == 1) $superincdiff = true;
 					$diffbonus = $superincdiff ? $this->superencorebonus : ($incdiff ? $this->encorebonus : 0);
 				} else $diffbonus = 0;
 				
@@ -97,8 +97,8 @@ class FSLister {
 			return true;
 		} else {
 			$this->listID     = null;
-			$this->listPass   = null;
 			$this->listHash	  = null;
+			$this->listPass   = null;
 			$this->listName   = null;
 			$this->listDesc   = null;
 			$this->listVisits = null;

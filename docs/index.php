@@ -79,6 +79,7 @@ if(isset($_GET['update'])) {
 		case 'name':
 			if(strlen($value) > 13 || strlen($value) < 1) 	error('Name is not within the character limit (1-13).', true);
 			if(!preg_match('/^\w+([ -_]\w+)*$/', $value)) 	error('Name is invalid (alphanumerical only with spaces/hypens/underscores)', true);
+			$_SESSION['name'] = $value; //Update user's session with new name
 			break;
 			
 		case 'desc':
@@ -96,11 +97,17 @@ if(isset($_GET['update'])) {
 			$value = intval($value);
 			if(!$value)					error('Invalid value for FC!', true);
 			if($value < 1 || $value > 660)			error('Invalid value range for FC!', true);
-			$fcvars = $database->fcRead($logged[0]);
+			$fcvars = $database->optRead($logged[0]);
 			if(!$fcvars['fctracker'])			error('FC Tracker isn\'t enabled in this list.', true);
 			if(!$fcvars['fchash'])				error('FC Hash hasn\'t been created for this list.', true);
 			$name  = 'fchash';
 			$value = substr_replace($fcvars['fchash'], ($FC ? '1' : '0'), ($value-1), 1);
+			break;
+			
+		case 'unlocker':
+			$value = json_decode($value); //Expecting a JS boolean
+			if(!is_bool($value))				error('Invalid value for unlocker!', true);
+			$value = $value ? 1 : 0; //Convert to TINYINT
 			break;
 			
 		default:

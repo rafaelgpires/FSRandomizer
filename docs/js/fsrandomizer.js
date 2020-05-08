@@ -126,7 +126,7 @@ try {
 	}
 } catch {}
 
-//Password modal
+//Password Modal
 $("#modalpass").on('shown.bs.modal', function() { $("#passinput").focus().removeClass("is-invalid"); });
 $("#passinput").on('keypress', function(e){ if(e.which === 13) { $("#submitpass").click(); e.preventDefault(); } });
 $("#submitpass").click(function() {
@@ -145,6 +145,11 @@ $("#submitpass").click(function() {
 	});
 });
 
+//FC Speed/Score Modals *TODO
+$("#submitspeed").click(function(){
+	
+});
+
 //Header: Edit Title/Description
 $("#listname").add("#listdesc").click(function(){
 	if(logged) {
@@ -157,13 +162,11 @@ $("#inputName").add("#inputDesc").on('keypress', function(e){ if(e.which === 13)
 	var value = $(this).val();
 	var limit = ($(this).attr('id') == 'inputName') ? 14 : 46;
 	if(value.length > 0 && value.length < limit && value.match(/^\w+([ -_]\w+)*$/)) {
-		console.log(1);
 		//It's valid, set it and update the DB
 		$.post('./?update', {UniqueID: ListID, name: $(this).data('name'), value: $(this).val()});
 		$(this).hide();
 		$(($(this).data('show'))).text($(this).val()).show();
 	} else {
-		console.log(2);
 		//It's not valid, ignore it and reset the value of the input before hiding it
 		$(this).val($(($(this).data('show'))).text()).hide();
 		$(($(this).data('show'))).show();
@@ -183,6 +186,18 @@ function toggleFCTracker(val) {
 }
 $("#enable_tracker").click(function(){ toggleFCTracker(1); });
 $("#disable_tracker").click(function(){ toggleFCTracker(0); });
+
+//Unlocker Enable/Disable
+$("#unlocker").click(function() {
+	if(logged) {
+		$.ajax({
+			url: '.?update',
+			type: 'POST',
+			data: {UniqueID: ListID, name: 'unlocker', value: !unlocker},
+			async: false,
+		}); location.reload();
+	} else $("#modalpass").modal('toggle');
+});
 
 //FC Mark FCs
 $(".NoFC").click(function() { updateFC(this, true); });
@@ -208,5 +223,30 @@ function updateFC(DOM, fc) {
 				difficulty = value;
 			
 		$("#fccount").parent().attr('class', ("Diff" + difficulty));
+		
+		//Update unlocker
+		if(unlocker && fc) {
+			//Find the next unlockable
+			var nextTR = $(DOM).parent().parent().nextAll('.d-none:first');
+			console.log(nextTR);
+			
+			//Check if it's a song or a chapter
+			if(nextTR.attr('name') == "chapter") {
+				//It's a chapter, unlock every song in the new chapter that's not an encore
+				do {
+					if(nextTR.attr('name') != 'encore')
+						nextTR.removeClass('d-none');
+					else break; //Stop at an encore
+				} while(nextTR = nextTR.next())
+			} else { 
+				//It's a song, unlock it if all previous songs in this chapter are FC'd
+				var chapterFCd = true;
+				nextTR.prevUntil('[name="chapter"]').each(function(){
+					if($(this).children().eq(1).children().attr('class') == 'NoFC')
+						chapterFCd = false;
+				});
+				if(chapterFCd) nextTR.removeClass('d-none');
+			}
+		}
 	} else $("#modalpass").modal('toggle');
 }

@@ -8,11 +8,12 @@ class FCTracker {
 	#Properties
 	private $database;			//Instance of SQLConn
 	public $list;				//Dependency Injection
-	public $fchash;				//Database: fchash
-	public $fctracker	= false;	//Database: fctracker
-	public $fcs2diff;			//Internal: Thresholds for difficulty icons/colors
-	
+	public $fctracker	= false;	//Database: Whether or not the tracker is on
+	public $fchash;				//Database: Generated hash for FCs
+	public $unlocker	= false;	//Database: Whether or not the unlocker is on
+	public $fcs2diff;			//Output: Thresholds for difficulty icons/colors
 	public $fccount		= 0;		//Output: Amount of FCs
+	public $unlock		= array();	//Output: Info for unlocks
 		
 	#Methods
 	public function __construct($list) {
@@ -22,7 +23,8 @@ class FCTracker {
 		if(!$this->list->readHash()) error('FCTracker was loaded without a valid list.', true); //Needs a valid list
 		
 		//Construct
-		foreach(($this->database->fcRead($this->list->listID)) as $key=>$value) $this->$key = $value;	//Load FC values from the database
+		foreach(($this->database->optRead($this->list->listID)) as $key=>$value) $this->$key = $value;	//Load options and values from the database
+		if($this->unlocker) $this->unlock['visibility'] = true;						//Initialize unlocker
 		$this->database->visitInc($this->list->listID, ++$this->list->listVisits);			//Increment visits
 		if($this->fctracker) {
 			//FC Count
@@ -71,11 +73,19 @@ class FCTracker {
 		
 		return $difficulty;
 	}
-	public function tableChapter($chapter) { echo "<tr><td colspan=3 class=\"chapter\">$chapter</td></tr>\n"; }
-	public function tableSong($songArr) {
+	public function tableChapter($chapter) { 
+		if($this->unlocker) { 
+			$this->unlock['chapter'] = $chapter; //Store chapter # and bool on whether all the songs have been FC'd
+			if($this->unlock['visibility'] == false) $unlock = 'd-none'; //Next song isn't visible, so this chapter isn't either
+			else $unlock = ''; //Next song is visible, so this chapter is visible
+		} else $unlock = ''; //Default to visible
+		echo "<tr name='chapter' class='$unlock'><td colspan=3 class=\"chapter\">$chapter</td></tr>\n";
+	}
+	public function tableSong($songArr) {		
 		//Check for encores
-		$song = preg_replace_callback("/^(\[(ENCORE)\] |\[(SUPER ENCORE)\] )/", function($encore){
-			global $songArr;
+		$songType = "song"; //Default to song
+		$song = preg_replace_callback("/^(\[(ENCORE)\] |\[(SUPER ENCORE)\] )/", function($encore) use ($songArr, &$songType){
+			$songType = "encore"; //Set it as encore
 			if(isset($encore[3])) {
 				//Super Encore, check for difficulty icon
 				if($songArr[0] >= 5) return '<img src="./images/diff_'.$songArr[0].'.png" class="diffIcon" /><b>Super Encore</b>: ';
@@ -83,19 +93,41 @@ class FCTracker {
 			} else return '<b>Encore</b>: '; //Encore
 		}, $songArr[1]); //No encore
 		
-		//Check for FC
+		//Check for FC and Unlocker (Unlocker relies on FC Tracker being enabled)
 		if($this->fctracker) { 
+			//Check FC
 			$FC = '<a data-count="' . ($songArr['count']+1) . '" class="' . ($songArr['fc'] ? 'FC' : 'NoFC') . '">&nbsp;</a>';
+			
+			//Check Unlocker
+			if($this->unlocker) {
+				//Check visibility
+				if($this->unlock['visibility']) $unlock = ''; //Song is visible
+				else {
+					//Visibility ended
+					if($this->unlock['visibleuntil'] == $this->unlock['chapter']) { 
+						//Visibility ended this chapter, so we can show only the rest of non-encores
+						if($songType == "encore") $unlock = 'd-none';
+						else $unlock = '';
+					} else $unlock = 'd-none'; //Visibility ended before this, hide song
+				}
+
+				if(!$songArr['fc'] && $this->unlock['visibility']) {
+					//End visibility on this chapter if this is the first non-FC
+					$this->unlock['visibility'] = false;
+					$this->unlock['visibleuntil'] = $this->unlock['chapter'];
+				}
+			}
 		} else $FC = null;
 		
 		//Add difficulty colors
 		$diff = $songArr[0];
 		$diff = "<span class=\"Diff$diff\">$diff / 10</span>";
 		
-		//Set game
-		$game = $songArr[2];
+		//Show song
+		$unlock = isset($unlock) ? $unlock : '';//Default to visible
+		$game   = $songArr[2];			//Get the game the song belongs to
 		echo <<<EOL
-			<tr>
+			<tr class="$unlock" name="$songType">
 				<td>$song</td>
 				<td>$FC</td>
 				<td>$diff</td>
@@ -112,8 +144,9 @@ EOL;
 	<?=$html->styles?>
 	<title>FSRandomizer - FC Tracker</title>
 	<script>var ListID="<?=$FCTracker->list->listID?>";</script>
-	<script>var logged=<?=json_encode($logged)?>;</script>
+	<script>var logged=<?php if($logged && $logged[0] == $FCTracker->list->listID) echo json_encode($logged); else echo 'false'; ?>;</script>
 	<script>var fcs2diff=JSON.parse('<?=json_encode($FCTracker->fcs2diff)?>');</script>
+	<script>var unlocker=<?=json_encode((bool)$FCTracker->unlocker)?></script>
 </head>
 <body>
 	<!-- Password Modal -->
@@ -133,6 +166,41 @@ EOL;
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-primary" id="submitpass">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Speed Modal *TODO) -->
+	<div class="modal fade" tabindex="-1" id="modalspeed">
+		<div class="modal-dialog modal-dialog-centered modalspeed">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Update FC</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="container">
+						<div class="row">
+							<div class="col-3">
+								<div class="form-group text-center">
+									<label for="speed" class="option">Speed</label>
+									<input type="text" class="form-control text-center" id="speed" value="100%" />
+								</div>
+							</div>
+							<div class="col-9">
+								<div class="form-group text-center">
+									<label for="speedproof" class="option">Proof</label>
+									<input type="text" class="form-control text-center speedproof" id="speedproof" placeholder="https://i.imgur.com/IMayVyn.png" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary" id="submitspeed">Submit</button>
 				</div>
 			</div>
 		</div>
@@ -173,7 +241,7 @@ EOL;
 						<?php if(!$FCTracker->fctracker) { ?><thead><th colspan=4>Your FC Tracker is disabled. Click <a href="#" id="enable_tracker">here</a> to enable it.</th></thead><?php } else { ?>
 							<thead class="text-center">
 								<th id="disable_tracker" class="thlink">Stats</th>
-								<th class="<?=("Diff".$FCTracker->convertFCs2Diff($FCTracker->fccount))?>"><span id='fccount'><?=$FCTracker->fccount?></span> / 660 FCs</th>
+								<th id="unlocker" class="thlink <?=("Diff".$FCTracker->convertFCs2Diff($FCTracker->fccount))?>"><span id='fccount'><?=$FCTracker->fccount?></span> / 660 FCs</th>
 								<th>Speed <a href="#">disabled</a></th>
 								<th>Score <a href="#">disabled</a></th>
 							</thead>
