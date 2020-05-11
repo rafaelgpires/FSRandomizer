@@ -44,8 +44,8 @@ class FCTracker {
 			}
 			
 			//Speed/Score
-			if($this->speeder) { if($this->speed) { $this->speed = json_decode($this->speed, true); $this->speed['avg'] = $this->statSum($this->speed) / count($this->speed); } else $this->speed['avg'] = '100'; }
-			if($this->scorer ) { if($this->score) { $this->score = json_decode($this->score, true); $this->score['acc'] = $this->statSum($this->score);                       } else $this->score['acc'] = '0';   }
+			if($this->speeder) { if($this->speed) { $this->speed = json_decode($this->speed, true); $this->speed['avg'] = $this->statSum($this->speed, 'speed'); } else $this->speed['avg'] = '100'; }
+			if($this->scorer ) { if($this->score) { $this->score = json_decode($this->score, true); $this->score['acc'] = $this->statSum($this->score, 'score'); } else $this->score['acc'] = '0';   }
 			
 			//Add Info to the array
 			$songcount = 0;
@@ -164,7 +164,17 @@ class FCTracker {
 EOL;
 	}
 
-	private function statSum($arr) { $total = 0; foreach($arr as $val) $total += $val[0]; return $total; }
+	private function statSum($arr, $type) { 
+		$total = 0; $count = 0;
+		foreach($arr as $key=>$val) {
+			if(($type == "speed" && $this->fchash[$key]) || $type != "speed") {
+				$total += $val[0];
+				$count++;
+			}
+		}
+			
+		return $type=="speed"?($total?($total/$count):100):$total;
+	}
 } $FCTracker = new FCTracker($list);
 ?>
 <html lang="en">
@@ -177,7 +187,16 @@ EOL;
 	<script>var logged=<?php if($logged && $logged[0] == $FCTracker->list->listID) echo json_encode($logged); else echo 'false'; ?>;</script>
 	<script>var fcs2diff=JSON.parse('<?=json_encode($FCTracker->fcs2diff)?>');</script>
 	<script>var unlocker=<?=json_encode((bool)$FCTracker->unlocker)?>;</script>
-	<?php if ($FCTracker->speeder) { ?><script>var speedArr=<?php $jsspeed = array(); foreach($FCTracker->speed as $k=>$v) if($k !== "avg" && $v[0] != 100) $jsspeed[$k]=intval($v[0]); echo json_encode($jsspeed); ?>;</script><?php } ?>
+	<?php
+		if ($FCTracker->speeder) {
+			$jsspeed = array();
+			foreach($FCTracker->speed as $k=>$v) 
+				if($k !== "avg" && $FCTracker->fchash[$k])
+					$jsspeed[$k] = intval($v[0]);
+			
+			echo '<script>var speedArr='.json_encode($jsspeed, JSON_FORCE_OBJECT).';</script>';
+		}
+	?>
 </head>
 <body>
 	<!-- Password Modal -->

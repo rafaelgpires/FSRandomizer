@@ -119,7 +119,7 @@ try {
 			}); window.location = './';
 		}).children("span").text(logged[1]);
 	}
-} catch {}
+} catch {} //Just in case logged isn't set we don't wanna crash JS
 
 //Password Modal
 $("#modalpass").on('shown.bs.modal', function() { $("#passinput").focus().removeClass("is-invalid"); });
@@ -141,6 +141,11 @@ $("#submitpass").click(function() {
 });
 
 //Speed Modal
+function updateSpeedAvg() {
+	if($.isEmptyObject(speedArr)) var average = 100;
+	else var average = Object.values(speedArr).reduce((s,v) => s+v) / Object.keys(speedArr).length;
+	$("#disable_speed").text(parseInt(average).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%");
+}
 $("[name='speed']").click(function(e) {
 	if(logged && !e.ctrlKey) {
 		$("#submitspeed").data('song', ($(this).parent().prev().children().data('count')));
@@ -164,14 +169,16 @@ $("#submitspeed").click(function(){
 	if(speed < 100 || speed > 999) { $("#speed").addClass('is-invalid'); return false; }
 	if(proof && !proof.match(regexp)) { $("#speedproof").addClass('is-invalid'); return false; }
 	
-	//Update page
+	//Update page: Speed data
 	var speedTR = $("[data-count='"+song+"']").parent().next().children();
 	if(proof) speedTR.attr('href', proof);
 	speedTR.text(speed + "%");
-	if(speed > 100) speedArr[(song-1)] = speed;
-	else delete speedArr[(song-1)];
-	var average = Object.values(speedArr).reduce((s,v) => s+v) / speedArr.length
-	$("#disable_speed").text(parseInt(average).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%");
+	
+	//Update page: Speed average
+	if($("[data-count='"+song+"']").attr('class') == "FC") { 
+		speedArr[(song-1)] = speed;
+		updateSpeedAvg();
+	}
 	
 	//Update database
 	$.post('.?update', {UniqueID: ListID, name: 'speed', value: song, speed: speed, proof: proof});
@@ -328,6 +335,13 @@ function updateFC(DOM, fc) {
 				});
 				if(chapterFCd) nextTR.removeClass('d-none');
 			}
+		}
+		
+		//Update speed average
+		if(typeof speedArr !== 'undefined') {
+			if(fc) speedArr[songcount-1] = parseInt($(DOM).parent().next().text().replace("%", ""));
+			else delete speedArr[songcount-1];
+			updateSpeedAvg();
 		}
 	} else $("#modalpass").modal('toggle');
 }
