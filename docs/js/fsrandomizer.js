@@ -1,6 +1,4 @@
-/* Global
- ****************************************************************************************************
- */
+/* Global *****************************************************************************************************/
 //Alerts
 function setAlert(id, message=null, type=null) {
 	if(!message) { $('#'+id).hide(); }
@@ -33,10 +31,9 @@ $("#InputIDForm").submit(function(){
 	return continueSubmit;
 });
 
-/* Landing Page
+/* Landing Page ***********************************************************************************************
  * No need to run a check on whether we're on the landing page, since jQuery does that check for us
  * the code will simply not run if the elements don't exist without throwing any errors
- ****************************************************************************************************
  */
 //Generator: Button
 $("#generator").click(function(){
@@ -108,9 +105,7 @@ $("#optionMenu").find('input').change(function(){
 	}
 });
 
-/* FCTracker
- ***************************************************************************************************
- */
+/* FCTracker **************************************************************************************************/
 //Logout
 try {
 	//Probably wanna do this server-side instead
@@ -145,9 +140,79 @@ $("#submitpass").click(function() {
 	});
 });
 
-//FC Speed/Score Modals *TODO
+//Speed Modal
+$("[name='speed']").click(function(e) {
+	if(logged && !e.ctrlKey) {
+		$("#submitspeed").data('song', ($(this).parent().prev().children().data('count')));
+		$("#modalspeed").modal('toggle');
+		e.preventDefault();
+	}
+});
+$("#modalspeed").on('shown.bs.modal', function() {
+	var speedTR = $("[data-count='"+$("#submitspeed").data('song')+"']").parent().next().children();
+	$("#speed").removeClass("is-invalid").val(speedTR.text());
+	$("#speedproof").removeClass('is-invalid').val(speedTR.attr('href'));
+});
+$("#speed").add("#speedproof").change(function(){ $(this).removeClass('is-invalid'); }).on('keypress', function(e) { if(e.which == 13) { $("#submitspeed").click(); e.preventDefault(); } });
 $("#submitspeed").click(function(){
+	//Parse
+	var song = $(this).data('song');
+	var speed = $("#speed").val();
+	var proof = $("#speedproof").val();
+	var regexp = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i;
+	speed = parseInt(speed.replace("%", ""));
+	if(speed < 100 || speed > 999) { $("#speed").addClass('is-invalid'); return false; }
+	if(proof && !proof.match(regexp)) { $("#speedproof").addClass('is-invalid'); return false; }
 	
+	//Update page
+	var speedTR = $("[data-count='"+song+"']").parent().next().children();
+	if(proof) speedTR.attr('href', proof);
+	speedTR.text(speed + "%");
+	if(speed > 100) speedArr[(song-1)] = speed;
+	else delete speedArr[(song-1)];
+	var average = Object.values(speedArr).reduce((s,v) => s+v) / speedArr.length
+	$("#disable_speed").text(parseInt(average).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%");
+	
+	//Update database
+	$.post('.?update', {UniqueID: ListID, name: 'speed', value: song, speed: speed, proof: proof});
+	$("#modalspeed").modal('toggle');
+});
+
+//Score Modal
+var prevscore = 0;
+$("[name='score']").click(function(e) { 
+	if(logged && !e.ctrlKey) {
+		$("#submitscore").data('song', ($(this).parent().prev().prev().children().data('count')));
+		$("#modalscore").modal('toggle');
+		e.preventDefault();
+	}
+});
+$("#modalscore").on('shown.bs.modal', function() {
+	var scoreTR = $("[data-count='"+$("#submitscore").data('song')+"']").parent().next().next().children();
+	prevscore = scoreTR.text().replace(/\.|,/g, "");
+	$("#score").removeClass("is-invalid").val(prevscore);
+	$("#scorescore").removeClass('is-invalid').val(scoreTR.attr('href'));
+});
+$("#score").add("#scoreproof").change(function(){ $(this).removeClass('is-invalid'); }).on('keypress', function(e) { if(e.which == 13) { $("#submitscore").click(); e.preventDefault(); } });
+$("#submitscore").click(function(){
+	//Parse
+	var score = $("#score").val().replace(/\.|,/g, "");
+	var proof = $("#scoreproof").val();
+	var regexp = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i;
+	if(score < 1 || score > 9999999) { $("#score").addClass('is-invalid'); return false; }
+	if(proof && !proof.match(regexp)) { $("#scoreproof").addClass('is-invalid'); return false; }
+	
+	//Update page
+	var scoreTR = $("[data-count='"+$(this).data('song')+"']").parent().next().next().children();
+	if(proof) scoreTR.attr('href', proof);
+	scoreTR.text(score.replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+	currentAcc = $("#disable_score").text().replace(/\.|,/g, "");
+	newAcc = parseInt(currentAcc) - parseInt(prevscore) + parseInt(score);
+	$("#disable_score").text(newAcc.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+	
+	//Update database
+	$.post('.?update', {UniqueID: ListID, name: 'score', value: $(this).data('song'), score: score, proof: proof});
+	$("#modalscore").modal('toggle');
 });
 
 //Header: Edit Title/Description
@@ -180,7 +245,7 @@ function toggleFCTracker(val) {
 			url: './?update',
 			type: 'POST',
 			data: {UniqueID: ListID, name: 'fctracker', value: val},
-			async: false,
+			async: false
 		}); location.reload();
 	} else $("#modalpass").modal('toggle');
 }
@@ -198,6 +263,22 @@ $("#unlocker").click(function() {
 		}); location.reload();
 	} else $("#modalpass").modal('toggle');
 });
+
+//Speed Enable/Disabled
+function toggleSS(type, val) {
+	if(logged) {
+		$.ajax({
+			url: './?update',
+			type: 'POST',
+			data: {UniqueID: ListID, name: type, value: val},
+			async: false
+		}); location.reload();
+	} else $("#modalpass").modal('toggle');
+}
+$("#enable_speed").click(function(){ toggleSS('speeder', 1); });
+$("#disable_speed").click(function() { toggleSS('speeder', 0); });
+$("#enable_score").click(function() { toggleSS('scorer', 1); });
+$("#disable_score").click(function() { toggleSS('scorer', 0); });
 
 //FC Mark FCs
 $(".NoFC").click(function() { updateFC(this, true); });

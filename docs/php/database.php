@@ -17,7 +17,7 @@ class SQLConn {
 	public function login    ($id   , $pass                     ):bool   { return ($pass == $this->selectID_query('pass', 'lists', $id)); }
 	public function update   ($col  , $val , $id                ):bool   { return $this->mysqli->query("UPDATE lists SET `$col`='".$this->mysqli->real_escape_string($val)."' WHERE id='$id'"); }
 	public function visitInc ($id   , $val                      ):bool   { return $this->mysqli->query("UPDATE lists SET `visits`=$val WHERE id='$id'"); }
-	public function optRead  ($id                               ):?array { return $this->selectID_query('`fctracker`, `fchash`, `unlocker`', 'lists', $id, false, true); }
+	public function optRead  ($id                               ):?array { return $this->selectID_query('`fctracker`, `fchash`, `unlocker`, `speeder`, `speed`, `scorer`, `score`', 'lists', $id, false, true); }
 	
 	private function insert_query($options, $table) {
 		foreach($options as $key=>$value)

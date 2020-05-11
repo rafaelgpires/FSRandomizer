@@ -66,4 +66,4 @@ td { color: #7F7F7F; font-size: 14px; padding: 6 12 !important; }
 .modalpass { max-width: 200px !important; }
 
 /* FCTracker: Speed/Score Modals */
-.speedproof::placeholder { color: #969696 !important; }
+::placeholder { color: #969696 !important; }

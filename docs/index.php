@@ -63,55 +63,95 @@ if(isset($_GET['generate'])) {
 //Parse input: Update
 if(isset($_GET['update'])) {
 	//Check if it's a valid request
-	if(!$logged) 							error('You\'re not logged in.', true);
-	if(!isset($_POST['UniqueID'])) 					error('You didn\'t tell me which list you wanna edit.', true);
-	if($logged[0] != $_POST['UniqueID']) 				error('You\'re not logged in the list you want to edit.', true);
-	if(!isset($_POST['name']) || !isset($_POST['value'])) 		error('Error: Don\'t know what you want to update.', true);
+	if(!$logged) 									error('You\'re not logged in.', true);
+	if(!isset($_POST['UniqueID'])) 							error('You didn\'t tell me which list you wanna edit.', true);
+	if($logged[0] != $_POST['UniqueID']) 						error('You\'re not logged in the list you want to edit.', true);
+	if(!isset($_POST['name']) || !isset($_POST['value'])) 				error('Error: Don\'t know what you want to update.', true);
 	
 	//Get list
 	$list    = new FSLister();
-	if(!$list->getList($_POST['UniqueID'])) 			error('Invalid list ID on update request.', true);
+	if(!$list->getList($_POST['UniqueID'])) 					error('Invalid list ID on update request.', true);
 	
 	//Parse input
 	$value = trim($_POST['value']);
 	$name  = trim($_POST['name']);
 	switch($name) {
 		case 'name':
-			if(strlen($value) > 13 || strlen($value) < 1) 	error('Name is not within the character limit (1-13).', true);
-			if(!preg_match('/^\w+([ -_]\w+)*$/', $value)) 	error('Name is invalid (alphanumerical only with spaces/hypens/underscores)', true);
-			$_SESSION['name'] = $value; //Update user's session with new name
+			//Filter
+			if(strlen($value) > 13 || strlen($value) < 1) 			error('Name is not within the character limit (1-13).', true);
+			if(!preg_match('/^\w+([ -_]\w+)*$/', $value)) 			error('Name is invalid (alphanumerical only with spaces/hypens/underscores)', true);
+			
+			//Update user's session with new name
+			$_SESSION['name'] = $value;
 			break;
 			
 		case 'desc':
-			if(strlen($value) > 45 || strlen($value) < 1) 	error('Description is not within the charater limit (1-45).', true);
-			if(!preg_match('/^\w+([ -_]\w+)*$/', $value)) 	error('Description is invalid (alphanumerical only with spaces/hypens/underscores)', true);
+			//Filter
+			if(strlen($value) > 45 || strlen($value) < 1) 			error('Description is not within the charater limit (1-45).', true);
+			if(!preg_match('/^\w+([ -_]\w+)*$/', $value)) 			error('Description is invalid (alphanumerical only with spaces/hypens/underscores)', true);
 			break;
 			
 		case 'fctracker':
-			if($value != 0 && $value != 1)			error('Invalid value for FCTracker!', true);
-			break;
-			
-		case 'FC': $FC = true;
-		case 'NoFC':
-			if(!isset($FC)) $FC = false;
-			$value = intval($value);
-			if(!$value)					error('Invalid value for FC!', true);
-			if($value < 1 || $value > 660)			error('Invalid value range for FC!', true);
-			$fcvars = $database->optRead($logged[0]);
-			if(!$fcvars['fctracker'])			error('FC Tracker isn\'t enabled in this list.', true);
-			if(!$fcvars['fchash'])				error('FC Hash hasn\'t been created for this list.', true);
-			$name  = 'fchash';
-			$value = substr_replace($fcvars['fchash'], ($FC ? '1' : '0'), ($value-1), 1);
+			//Filter
+			if($value != 0 && $value != 1)					error('Invalid value for FCTracker!', true);
 			break;
 			
 		case 'unlocker':
+			//Filter
 			$value = json_decode($value); //Expecting a JS boolean
-			if(!is_bool($value))				error('Invalid value for unlocker!', true);
+			if(!is_bool($value))						error('Invalid value for unlocker!', true);
 			$value = $value ? 1 : 0; //Convert to TINYINT
 			break;
 			
+		case 'speeder': case 'scorer':
+			//Filter
+			if($value != 0 && $value != 1)					error('Invalid value for Speed tracker.', true);
+			break;
+		
+		//FC Array Update
+		case 'FC': $FC = true;
+		case 'NoFC':
+			//Filter
+			if(!isset($FC)) $FC = false;
+			$value = intval($value);
+			if(!$value)							error('Invalid value for FC!', true);
+			if($value < 1 || $value > 660)					error('Invalid value range for FC!', true);
+			
+			//Get array
+			$fcvars = $database->optRead($logged[0]);
+			if(!$fcvars['fctracker'])					error('FC Tracker isn\'t enabled in this list.', true);
+			if(!$fcvars['fchash'])						error('FC Hash hasn\'t been created for this list.', true);
+			
+			//Update array and col/val
+			$name  = 'fchash';
+			$value = substr_replace($fcvars['fchash'], ($FC ? '1' : '0'), ($value-1), 1);
+			break;
+		
+		//Speed/Score Array Update
+		case 'speed': case 'score':
+			//Filter
+			if($value < 1 || $value > 660)					error('Invalid ID range.', true);
+			if(!isset($_POST[$name]))					error('Value not given.', true);
+			if(!isset($_POST['proof']))					error('Proof value not given.', true);
+			$sval = intval(str_replace("%", "", $_POST[$name]));
+			$proof = $_POST['proof'];
+			if(!is_int($sval))						error('Invalid value.', true);
+			if($name == 'speed') if($sval < 100 || $sval > 999)		error('Speed value out of range.', true);
+			if($name == 'score') if($sval < 1 || $sval > 9999999)		error('Score value out of range.', true);
+			if(!empty($proof) && !filter_var($proof, FILTER_VALIDATE_URL))	error('Invalid proof value.', true);
+			
+			//Get array
+			$fcvars = $database->optRead($logged[0]);
+			if($fcvars[$name]) $speedArr = json_decode($fcvars[$name], true);
+			else $speedArr = array();
+			
+			//Update array and col/val
+			$speedArr[($value-1)] = array($sval, $proof);
+			$value = json_encode($speedArr);
+			break;
+			
 		default:
-									error('Unrecognised value name.', true);
+											error('Unrecognised value name.', true);
 	}
 	
 	//Update database
