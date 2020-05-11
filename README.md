@@ -9,5 +9,4 @@ https://trello.com/b/1JevMmjv/project-001-kanban-ch-fsrandomizer
 Master FC Breakdown created by Phase 1 in Deprecated.
 
 Removed Ted Nugent and Zakk Wylde guitar battle from the FS to make an even 660 songs\
-Due to Clone Hero having no "battle" in Quickplay or career mode to simulate those,\
-The WT battles are charts that are really hard to find as well
+Due to Clone Hero having no "battle" in Quickplay or career mode to simulate those
