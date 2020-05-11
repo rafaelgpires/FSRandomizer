@@ -21,3 +21,49 @@ form { margin-block-end: 0; }
 .option { font-size: 10pt; font-weight: bold; }
 .optionalert { font-size: 10pt; margin: 0; }
 .check-label { font-size: 7.8pt; font-weight: normal; }
+
+/* FCTracker: Header */
+.listheader { height: 350px; background: url('../images/crowd_silhouette.png') no-repeat center; }
+.listheader img { width: 100px; height: 100px; }
+.listheader h1 { margin: 0; font-size: 40px; font-weight: bold; font-family: 'Georgia'; color: #7F7F7F; }
+.listheader h2 { margin: 0; font-size: 20px; color: #7F7F7F; }
+.listname { border: none transparent; outline: none; padding: 0; margin: 0; width: 321px; height: 48px; font-size: 40px; font-weight: bold; font-family: 'Georgia'; color: #7F7F7F; text-align:center; display: none;  }
+.listdesc { border: none transparent; outline: none; padding: 0; margin: 0; height: 24px; font-size: 20px; color: #7F7F7F; text-align: center; display: none; }
+.listicon { display: flex; justify-content: center; height: 100px; }
+.listtitle { display: flex; justify-content: center; height: 58px; padding-top: 10px; }
+.listdescription { display: flex; justify-content: center; height: 34px; padding-top: 10px; }
+.listfiller { height: 158px; }
+.listalerts { max-width: 932px; }
+thead { color: #919191 !important; font-size: 20px; font-weight: bold; }
+thead a { color: #2699FB !important; text-decoration: none !important; }
+.pass { color: red; }
+.passalert { background-color: #f8d7da; border: 1px solid transparent; border-radius: 4px; }
+.thlink { cursor: pointer; }
+
+/* FCTracker: List */
+.listsongs { max-width: 932px; }
+.chapter { color: #7F7F7F; font-size: 20px; font-weight: bold; padding: 12 !important; }
+td { color: #7F7F7F; font-size: 14px; padding: 6 12 !important; }
+.NoFC:hover {  background: url('../images/fc.png') 74px 0; }
+.NoFC { cursor: pointer; display: block; margin: -5px 0; height: 26px; width: 37px; background: url('../images/fc.png') 0 0; }
+.FC { cursor: pointer; display: block; margin: -5px 0; height: 26px; width: 37px; background: url('../images/fc.png') 37px 0; }
+
+/* FCTracker: Difficulty Colors */
+.diffIcon { width: 33px; height: 33px; margin: -6px 0 -6px -6px; }
+.Diff10 { color: #6e0019; text-shadow: 2px 2px 22px #000000; }
+.Diff9 { color: #a50026; }
+.Diff8 { color: #d73027; }
+.Diff7 { color: #f46d43; }
+.Diff6 { color: #fdae61; }
+.Diff5 { color: #ebd417; }
+.Diff4 { color: #abd9e9; }
+.Diff3 { color: #74add1; }
+.Diff2 { color: #4575b4; }
+.Diff1 { color: #313695; }
+
+/* FCTracker: Password */
+.passinput { width: 166px !important; }
+.modalpass { max-width: 200px !important; }
+
+/* FCTracker: Speed/Score Modals */
+::placeholder { color: #969696 !important; }

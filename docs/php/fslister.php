@@ -12,13 +12,18 @@ class FSLister {
 	public $superencorebonus	= 25;		//Intended % of RNG added to variance for much harder encores
 	public $resetencores		= false;	//Whether to reset encores during each encore song
 
-	private $database;				//Instance of /SQL/SQLConn
+	private $database;				//Instance of SQLConn
 	private $breakdown;				//For reading breakdown.txt
 	private $songlist;				//For interpreting breakdown.txt
 
 	public $fslist;					//Output: Array list
-	public $hash;					//Output: Hash of the list
-	public $listID;					//Unique ID given to the created list
+	public $listHash;				//Var: Hash
+	public $listID;					//Var: Unique ID
+	public $listName;				//Var: Name
+	public $listDesc;				//Var: Description
+	public $listPass;				//Var: Password
+	public $listVisits;				//Var: Visits counter
+	public $listFCs;				//Ext Var: FC Array from DB
 	
 	#Methods
 	public function __construct() {
@@ -54,16 +59,16 @@ class FSLister {
 				
 				//Encores have a chance for increased difficulty
 				if($x >= ($this->nsongs - floor($this->nsongs/5))) {
-					if(rand(1, ($this->encore      /100)) == 1) $incdiff      = true;
-					if(rand(1, ($this->superencore /100)) == 1) $superincdiff = true;
-					$diffbonus = $superincdiff ? ($this->superencorebonus/100) : ($incdiff ? ($this->encorebonus/100) : 0);
+					if($this->encore)      if(rand(1, (100 / $this->encore     )) == 1) $incdiff      = true;
+					if($this->superencore) if(rand(1, (100 / $this->superencore)) == 1) $superincdiff = true;
+					$diffbonus = $superincdiff ? $this->superencorebonus : ($incdiff ? $this->encorebonus : 0);
 				} else $diffbonus = 0;
 				
 				//Get a song within $variance + $diffbonus of available songs
 				$count   = count($fssonglist);
-				$min     = $diffbonus ? floor($count * $diffbonus) : 0;
-				$max     = floor($count * (($this->variance/100) + $diffbonus));
-				$songkey = rand($min, $max);
+				$min     = $diffbonus ? ceil($count * ($diffbonus/100)) : 1;
+				$max     = ceil($count * (($this->variance/100) + ($diffbonus/100)));
+				$songkey = rand($min, $max) - 1;
 				
 				//Write the song into the chapter
 				$song    = $fssonglist[$songkey];
@@ -80,18 +85,34 @@ class FSLister {
 		$this->createHash();
 		$this->storeList();
 	}
-	public function getHash($id): bool {
-		$this->hash = $this->database->readHash($id);
-		return !is_null($this->hash);
+	public function getList($id):bool {
+		$list = $this->database->readList($id);
+		if(!is_null($list)) {
+			$this->listID     = $id;
+			$this->listHash	  = $list[0];
+			$this->listPass   = $list[1];
+			$this->listName   = $list[2];
+			$this->listDesc   = $list[3];
+			$this->listVisits = $list[4];
+			return true;
+		} else {
+			$this->listID     = null;
+			$this->listHash	  = null;
+			$this->listPass   = null;
+			$this->listName   = null;
+			$this->listDesc   = null;
+			$this->listVisits = null;
+			return false;
+		}
 	}
-	public function readHash($hash = null) {
-		$hash = $hash ? $hash : $this->hash;
+	public function readHash($hash = null): bool {
+		$hash = $hash ? $hash : $this->listHash;
 		
 		//Check for errors
-		if(!$hash) error("Internal Error: No hash given.", true);
+		if(!$hash) { $this->fslist = null; return false; }
 		
 		//Reset the list
-		$this->hash   = $hash;
+		$this->listHash   = $hash;
 		$this->fslist = array();
 		
 		//Read the hash by chapters
@@ -114,14 +135,14 @@ class FSLister {
 				//Register the song in the chapter
 				$this->fslist[$hashchapter][] = $song;
 			}
-		}
+		} return true;
 	}
 
 	private function createHash() {
-		$this->hash = ''; //Reset hash
+		$this->listHash = ''; //Reset hash
 		
 		foreach($this->fslist as $chapter) {
-			$this->hash .= '|'; //Write chapter separator
+			$this->listHash .= '|'; //Write chapter separator
 			foreach($chapter as $song) {
 				//Check for encores
 				$match = preg_match('/^(\[ENCORE\] )|(\[SUPER ENCORE\] )/', $song[1], $encore);
@@ -129,16 +150,20 @@ class FSLister {
 				else $encore = 0;
 				
 				//Write the hash for the song
-				$this->hash .= $encore . str_pad($song[3], 3, 0, STR_PAD_LEFT);
+				$this->listHash .= $encore . str_pad($song[3], 3, 0, STR_PAD_LEFT);
 			}
 		}
 		
 		//Store hash
-		$this->hash = substr($this->hash, 1);
+		$this->listHash = substr($this->listHash, 1);
 	}
 	private function storeList() {
-		$this->listID = uniqid(); //Create a unique ID for the list
-		$this->database->storeHash($this->listID, $this->hash);
+		$this->listID   = uniqid();					//Create a unique ID for the list
+		$this->listName = $this->listID;				//Default name is always the ID
+		$this->listDesc = "Full Series List";				//Default description
+		$this->listPass = bin2hex(openssl_random_pseudo_bytes(2));	//Random password
+		if(!$this->database->storeList($this->listID, $this->listHash, $this->listPass, $this->listName, $this->listDesc))
+			error("Internal error: Couldn't save your list.", true);
 	}
 	private function findSongKey($songarr) {
 		foreach($this->songlist as $key=>$song) {

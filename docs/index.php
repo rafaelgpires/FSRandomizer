@@ -5,42 +5,157 @@ require("includes/func_notepadTable.php");
 require("php/database.php");
 require("php/fslister.php");
 require("php/error.php");
+require("php/html.php");
+$database = new SQLConn();
+$html     = new HTML();
 
-//HTML Object
-class HTML {
-	public $navbar, $scripts, $metalinks;
-	public function __construct($dir) {
-		$this->navbar = file_get_contents($dir . '/navbar.html');
-	}
-} $html = new HTML('./html');
+//Check session
+$logged = false;
+if(isset($_SESSION['logged']) && isset($_SESSION['name']))
+	$logged = array($_SESSION['logged'], $_SESSION['name']);
 
 //Parse input: UniqueID
 if(isset($_GET['UniqueID'])) {
-	//UniqueID is given and output variable is set
+	//UniqueID is given, check validity before continuing
+	$list    = new FSLister();
+	$success = $list->getList($_GET['UniqueID']);
+	
+	//Parse other options
 	if(isset($_GET['output'])) {
-		$list = new FSLister();
-		$success = $list->getHash($_GET['UniqueID']);
+		//Output has been requested
 		switch($_GET['output']) {
-			case 'hash': echo $list->hash; break; //Empty output if Invalid ID
+			case 'hash': echo $list->listHash; break; //Empty output if Invalid ID
+			case 'logout': unset($_SESSION['logged'], $_SESSION['name']); //Empty output
 			case 'validate': echo json_encode($success); break;
+			case 'validatepass':
+				if(!isset($_GET['pass'])) error('Login attempt without password.');
+				$login = $database->login($list->listID, $_GET['pass']);
+				if($login) { 
+					$_SESSION['logged'] = $list->listID; 
+					$_SESSION['name']   = $list->listName; 
+				} echo json_encode($login);
+				break;
 			default: error("No valid output type given.", true);
 		}
-	} else require("fctracker.php"); //UniqueID is given but no output requested, load fctracker.php
+	} elseif($success) require("fctracker.php"); //UniqueID is valid and there's no output request, load fctracker.php
+	else error('Invalid list ID!', true); //UniqueID is invalid and there's no output request, show error
 	exit;
 }
 
 //Parse input: Generate
 if(isset($_GET['generate'])) {
 	$list = new FSLister();
-	$list->createList();
 	
 	//Parse options
 	if(isset($_POST['options']))
 		foreach(json_decode($_POST['options']) as $key=>$value)
-			$list->$key = $value;
+			if(in_array($key, array('nsongs', 'variance', 'encore', 'encorebonus', 'superencore', 'superencorebonus', 'resetencores')))
+				$list->$key = intval($value);
 	
-	//Output ID
+	//Create List, Login and output ID
+	$list->createList();
+	$_SESSION['logged'] = $list->listID;
+	$_SESSION['name']   = $list->listName;
 	echo json_encode($list->listID);
+	exit;
+}
+
+//Parse input: Update
+if(isset($_GET['update'])) {
+	//Check if it's a valid request
+	if(!$logged) 									error('You\'re not logged in.', true);
+	if(!isset($_POST['UniqueID'])) 							error('You didn\'t tell me which list you wanna edit.', true);
+	if($logged[0] != $_POST['UniqueID']) 						error('You\'re not logged in the list you want to edit.', true);
+	if(!isset($_POST['name']) || !isset($_POST['value'])) 				error('Error: Don\'t know what you want to update.', true);
+	
+	//Get list
+	$list    = new FSLister();
+	if(!$list->getList($_POST['UniqueID'])) 					error('Invalid list ID on update request.', true);
+	
+	//Parse input
+	$value = trim($_POST['value']);
+	$name  = trim($_POST['name']);
+	switch($name) {
+		case 'name':
+			//Filter
+			if(strlen($value) > 13 || strlen($value) < 1) 			error('Name is not within the character limit (1-13).', true);
+			if(!preg_match('/^\w+([ -_]\w+)*$/', $value)) 			error('Name is invalid (alphanumerical only with spaces/hypens/underscores)', true);
+			
+			//Update user's session with new name
+			$_SESSION['name'] = $value;
+			break;
+			
+		case 'desc':
+			//Filter
+			if(strlen($value) > 45 || strlen($value) < 1) 			error('Description is not within the charater limit (1-45).', true);
+			if(!preg_match('/^\w+([ -_]\w+)*$/', $value)) 			error('Description is invalid (alphanumerical only with spaces/hypens/underscores)', true);
+			break;
+			
+		case 'fctracker':
+			//Filter
+			if($value != 0 && $value != 1)					error('Invalid value for FCTracker!', true);
+			break;
+			
+		case 'unlocker':
+			//Filter
+			$value = json_decode($value); //Expecting a JS boolean
+			if(!is_bool($value))						error('Invalid value for unlocker!', true);
+			$value = $value ? 1 : 0; //Convert to TINYINT
+			break;
+			
+		case 'speeder': case 'scorer':
+			//Filter
+			if($value != 0 && $value != 1)					error('Invalid value for Speed tracker.', true);
+			break;
+		
+		//FC Array Update
+		case 'FC': $FC = true;
+		case 'NoFC':
+			//Filter
+			if(!isset($FC)) $FC = false;
+			$value = intval($value);
+			if(!$value)							error('Invalid value for FC!', true);
+			if($value < 1 || $value > 660)					error('Invalid value range for FC!', true);
+			
+			//Get array
+			$fcvars = $database->optRead($logged[0]);
+			if(!$fcvars['fctracker'])					error('FC Tracker isn\'t enabled in this list.', true);
+			if(!$fcvars['fchash'])						error('FC Hash hasn\'t been created for this list.', true);
+			
+			//Update array and col/val
+			$name  = 'fchash';
+			$value = substr_replace($fcvars['fchash'], ($FC ? '1' : '0'), ($value-1), 1);
+			break;
+		
+		//Speed/Score Array Update
+		case 'speed': case 'score':
+			//Filter
+			if($value < 1 || $value > 660)					error('Invalid ID range.', true);
+			if(!isset($_POST[$name]))					error('Value not given.', true);
+			if(!isset($_POST['proof']))					error('Proof value not given.', true);
+			$sval = intval(str_replace("%", "", $_POST[$name]));
+			$proof = $_POST['proof'];
+			if(!is_int($sval))						error('Invalid value.', true);
+			if($name == 'speed') if($sval < 100 || $sval > 999)		error('Speed value out of range.', true);
+			if($name == 'score') if($sval < 1 || $sval > 9999999)		error('Score value out of range.', true);
+			if(!empty($proof) && !filter_var($proof, FILTER_VALIDATE_URL))	error('Invalid proof value.', true);
+			
+			//Get array
+			$fcvars = $database->optRead($logged[0]);
+			if($fcvars[$name]) $speedArr = json_decode($fcvars[$name], true);
+			else $speedArr = array();
+			
+			//Update array and col/val
+			$speedArr[($value-1)] = array($sval, $proof);
+			$value = json_encode($speedArr);
+			break;
+			
+		default:
+											error('Unrecognised value name.', true);
+	}
+	
+	//Update database
+	$database->update($name, $value, $list->listID);
 	exit;
 }
 
@@ -62,13 +177,12 @@ if(isset($_GET['http_error'])) {
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<link rel="stylesheet" type="text/css" href="css/fsrandomizer.css">
+	<?=$html->styles?>
 	<title>FSRandomizer</title>
 </head>
 <body>
 	<!-- Content -->
-	<div class="container" style="height: 100vh">
+	<div class="container vh-100">
 		<!-- Navbar -->
 		<div class="row h-25 pt-4 align-items-top">
 			<?=$html->navbar?>
@@ -76,7 +190,7 @@ if(isset($_GET['http_error'])) {
 		
 		<!-- Generation -->
 		<div class="row h-50 align-items-center">
-			<div class="container mt-6">
+			<div class="container">
 				<div class="row d-flex justify-content-center">
 					<div class="alert d-none" role="alert" id="alert"></div>
 				</div>
@@ -89,7 +203,7 @@ if(isset($_GET['http_error'])) {
 				</div>
 				<div class="row mt-4 d-flex justify-content-center">
 					<a class="options" id="options"></a>
-					<div class="modal fade" id="optionsMenu">
+					<div class="modal fade" tab-index="-1" id="optionsMenu">
 						<div class="modal-dialog modal-dialog-centered modal-sm" role="document">
 							<div class="modal-content">
 								<div class="modal-header"><h5 class="modal-title w-100 text-center">OPTIONS</h5></div>
@@ -167,9 +281,8 @@ if(isset($_GET['http_error'])) {
 											<p>Supers (<span class="info">20%</span>) are <span class="info">25% harder</span>.</p>
 											<p><span class="info">Consistent</span> difficulty within encores.</p>
 										</div>
-										<div class="row d-flex justify-content-center">
-											<button type="button" class="btn btn-primary mr-4" id="reset">Reset</button>
-											<button type="button" class="btn btn-primary ml-4" data-dismiss="modal">Close</button>
+										<div class="row d-flex justify-content-end">
+											<button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
 										</div>
 									</div>
 								</div>
@@ -214,9 +327,6 @@ if(isset($_GET['http_error'])) {
 	</div>
 	
 	<!-- jQuery, Popper, bootstrap.js, Local scripts -->
-	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-	<script src="./js/fsrandomizer.js"></script>
+	<?=$html->links?>
 </body>
 </html>
