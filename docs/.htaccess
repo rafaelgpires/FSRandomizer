@@ -11,8 +11,8 @@ RewriteCond %{REQUEST_URI} ^(.*)\/(400|403|404|500)$
 RewriteRule ^(.*)$ index.php?http_error=$1 [QSD,L]
 
 #Force Clean URL
-#Pick up any other 1-variable GET request and clean it
-RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s\/?(index\.php)?[^&=]+=([^&\ ]+)(\ |$)
+#Pick up any UniqueID GET request and clean it
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s\/?(index\.php)?[^&=\?]+\?UniqueID=([^&\ ]+)(\ |$)
 RewriteRule ^(.*)$ %2 [R=301,QSD,L]
 
 #Clean URL
