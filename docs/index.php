@@ -159,7 +159,6 @@ if(isset($_GET['update'])) {
 	exit;
 }
 
-
 //Parse input: Common HTTP Errors
 if(isset($_GET['http_error'])) {
 	switch($_GET['http_error']) {
@@ -299,26 +298,26 @@ if(isset($_GET['http_error'])) {
 				<div class="row justify-content-around">
 					<div class="col-md-4 pb-5">
 						<div class="container">
-							<a href="#" target="_blank" class="link-unstyled">
+							<a href="./Original Series.zip" target="_blank" class="link-unstyled">
 								<div class="row mb-2 text-nowrap">
 									<div class="col p-0 text-nowrap"><b>Download the Charts</b></div>
 									<div class="col p-0 text-right align-self-center d-none d-lg-block"><img src="./images/+.png" /></div>
 								</div>
 							</a>
-							<div class="row text-nowrap"><p><a href="#" target="_blank">Download</a> the full GH Series Charts!</p></div>
-							<div class="row text-nowrap"><p>Click <a href="#" target="_blank">here</a> for DLC and <a href="#" target="_blank">here</a> for extra original content.</p></div>
+							<div class="row text-nowrap"><p><a href="./Original Series.zip" target="_blank">Download</a> the full GH Series Charts!</p></div>
+							<div class="row text-nowrap"><p>Click <a href="./Original Series DLC.7z" target="_blank">here</a> for DLC and <a href="./Original Series Extra.zip" target="_blank">here</a> for extra original content.</p></div>
 						</div>
 					</div>
 					<div class="col-md-4 pb-5">
 						<div class="container">
-							<a href="#" target="_blank" class="link-unstyled">
+							<a href="./FSRandomizer.exe" target="_blank" class="link-unstyled">
 								<div class="row mb-2 text-nowrap">
 									<div class="col p-0 text-nowrap"><b>Your list in Clone Hero</b></div>
 									<div class="col p-0 text-right align-self-center d-none d-lg-block"><img src="./images/+.png" /></div>
 								</div>
 							</a>
-							<div class="row text-nowrap"><p>Download our <a href="#" target="_blank">App</a> to bring your list to Clone Hero!</p></div>
-							<div class="row text-nowrap"><p>It's <a href="https://github.com/rafaelgpires/FSRandomizer-App/" target="_blank">Open Source</a> and requires using <a href="#" target="_blank">these charts</a>.</p></div>
+							<div class="row text-nowrap"><p>Download our <a href="./FSRandomizer.exe" target="_blank">App</a> to bring your list to Clone Hero!</p></div>
+							<div class="row text-nowrap"><p>It's <a href="https://github.com/rafaelgpires/FSRandomizer-App/" target="_blank">Open Source</a> and requires using <a href="./Original Series.zip" target="_blank">these charts</a>.</p></div>
 						</div>
 					</div>
 				</div>
