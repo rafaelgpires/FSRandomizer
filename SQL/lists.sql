@@ -25,6 +25,17 @@ DROP TABLE IF EXISTS `lists`;
 CREATE TABLE `lists` (
   `id` varchar(45) NOT NULL,
   `hash` text NOT NULL,
+  `pass` varchar(4) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  `desc` varchar(45) NOT NULL,
+  `visits` int NOT NULL,
+  `fctracker` tinyint NOT NULL DEFAULT '0',
+  `fchash` text,
+  `unlocker` tinyint NOT NULL DEFAULT '0',
+  `speeder` tinyint NOT NULL DEFAULT '0',
+  `speed` text,
+  `scorer` tinyint NOT NULL DEFAULT '0',
+  `score` text,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -38,4 +49,4 @@ CREATE TABLE `lists` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-04-23 18:53:00
+-- Dump completed on 2020-05-14 11:04:40
