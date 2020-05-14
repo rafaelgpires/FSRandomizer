@@ -1,12 +1,12 @@
 RewriteEngine On
-RewriteBase /FSRandomizer/docs/
+RewriteBase /FSRandomizer/
 
 #Handle errors
-ErrorDocument 400 /FSRandomizer/docs/400
-ErrorDocument 401 /FSRandomizer/docs/401
-ErrorDocument 404 /FSRandomizer/docs/404
-ErrorDocument 403 /FSRandomizer/docs/403
-ErrorDocument 500 /FSRandomizer/docs/500
+ErrorDocument 400 /FSRandomizer/400
+ErrorDocument 401 /FSRandomizer/401
+ErrorDocument 404 /FSRandomizer/404
+ErrorDocument 403 /FSRandomizer/403
+ErrorDocument 500 /FSRandomizer/500
 RewriteCond %{REQUEST_URI} ^(.*)\/(400|403|404|500)$
 RewriteRule ^(.*)$ index.php?http_error=$1 [QSD,L]
 
