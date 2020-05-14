@@ -298,14 +298,14 @@ if(isset($_GET['http_error'])) {
 				<div class="row justify-content-around">
 					<div class="col-md-4 pb-5">
 						<div class="container">
-							<a href="./Original Series.zip" target="_blank" class="link-unstyled">
+							<a href="https://drive.google.com/open?id=10bUgi6oxG1wiYg1R41-G6oD-lzUEmlzz" target="_blank" class="link-unstyled">
 								<div class="row mb-2 text-nowrap">
 									<div class="col p-0 text-nowrap"><b>Download the Charts</b></div>
 									<div class="col p-0 text-right align-self-center d-none d-lg-block"><img src="./images/+.png" /></div>
 								</div>
 							</a>
-							<div class="row text-nowrap"><p><a href="./Original Series.zip" target="_blank">Download</a> the full GH Series Charts!</p></div>
-							<div class="row text-nowrap"><p>Click <a href="./Original Series DLC.7z" target="_blank">here</a> for DLC and <a href="./Original Series Extra.zip" target="_blank">here</a> for extra original content.</p></div>
+							<div class="row text-nowrap"><p><a href="https://drive.google.com/open?id=10bUgi6oxG1wiYg1R41-G6oD-lzUEmlzz" target="_blank">Download</a> the full GH Series Charts!</p></div>
+							<div class="row text-nowrap"><p>Click <a href="https://drive.google.com/open?id=1LAD7GzsTKqUOZWVauVvdq4JuHhndTKlf" target="_blank">here</a> for DLC and <a href="https://drive.google.com/open?id=1ZO39MbjqqU_UxEn6vsL6c8Bnna_r9rMF" target="_blank">here</a> for extra original content.</p></div>
 						</div>
 					</div>
 					<div class="col-md-4 pb-5">
