@@ -1,7 +1,7 @@
 <?php
 const server = 'localhost';
-const user   = 'root';
-const pass   = 'lara';
+const user   = '';
+const pass   = '';
 const db     = 'ch_fsrandomizer';
 
 class SQLConn {
