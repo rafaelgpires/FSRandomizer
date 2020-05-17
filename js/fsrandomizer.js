@@ -105,6 +105,9 @@ $("#optionMenu").find('input').change(function(){
 	}
 });
 
+//App Download: Show Modal
+$("[name='appdownload']").click(function(){ $("#appmodal").modal('show'); });
+
 /* FCTracker **************************************************************************************************/
 //Logout
 try {

@@ -180,6 +180,33 @@ if(isset($_GET['http_error'])) {
 	<title>FSRandomizer</title>
 </head>
 <body>
+	<!-- App Download Modal -->
+	<div id="appmodal" class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">FSRandomizer App</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p class="text-center">Your list's chapters will appear in your Clone Hero setlist!<br />Good luck on your Full Series Full Combo!</p>
+					<img class="d-flex mx-auto my-4" src='./images/diff_10.png' />
+					<h5 class="text-center alert alert-danger">Warning</h1>
+					<p>Due to cost, this application is currently <abbr title="It hasn't been signed with a trusted Code Sign Certificate">unsigned</abbr>.</p>
+					<p>You may get some scary warnings about running it!</p>
+					<br />
+					<p>If you don't trust it, it's <a href="https://github.com/rafaelgpires/FSRandomizer-App" target="_blank">Open Source</a>, you can compile it with <a href="https://visualstudio.microsoft.com/vs/" target="_blank">Visual Studio</a>!</p>
+					<p>If you're a developer and would like to sign these binaries, please <a href="mailto:app@fsrandomizer.psarchives.com">contact us</a>.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<!-- Content -->
 	<div class="container vh-100">
 		<!-- Navbar -->
@@ -310,13 +337,13 @@ if(isset($_GET['http_error'])) {
 					</div>
 					<div class="col-md-4 pb-5">
 						<div class="container">
-							<a href="./FSRandomizer.zip" target="_blank" class="link-unstyled">
+							<a name="appdownload" href="./FSRandomizer.zip" target="_blank" class="link-unstyled">
 								<div class="row mb-2 text-nowrap">
 									<div class="col p-0 text-nowrap"><b>Your list in Clone Hero</b></div>
 									<div class="col p-0 text-right align-self-center d-none d-lg-block"><img src="./images/+.png" /></div>
 								</div>
 							</a>
-							<div class="row text-nowrap"><p>Download our <a href="./FSRandomizer.zip" target="_blank">App</a> to bring your list to Clone Hero!</p></div>
+							<div class="row text-nowrap"><p>Download our <a name="appdownload" href="./FSRandomizer.zip" target="_blank">App</a> to bring your list to Clone Hero!</p></div>
 							<div class="row text-nowrap"><p>It's <a href="https://github.com/rafaelgpires/FSRandomizer-App/" target="_blank">Open Source</a> and requires using <a href="https://drive.google.com/open?id=10bUgi6oxG1wiYg1R41-G6oD-lzUEmlzz" target="_blank">these charts</a>.</p></div>
 						</div>
 					</div>
