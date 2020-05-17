@@ -28,7 +28,7 @@ if(isset($_GET['UniqueID'])) {
 			case 'logout': unset($_SESSION['logged'], $_SESSION['name']); //Empty output
 			case 'validate': echo json_encode($success); break;
 			case 'validatepass':
-				if(!isset($_GET['pass'])) error('Login attempt without password.');
+				if(!isset($_GET['pass'])) error('Login attempt without password.', true);
 				$login = $database->login($list->listID, $_GET['pass']);
 				if($login) { 
 					$_SESSION['logged'] = $list->listID; 
