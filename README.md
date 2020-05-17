@@ -6,5 +6,5 @@ Removed Ted Nugent and Zakk Wylde guitar battle from the FS to make an even 660 
 Due to Clone Hero having no "battle" in Quickplay or career mode to simulate those
 
 # Future Features
-If there's more than a few users in this website, leaderboards will be implemented.
+If there's more than a few users in this website, leaderboards will be implemented.  
 This project will be cloned into a new project with Chorus integration to allow tracking Chorus' customs in a new website.
