@@ -310,14 +310,14 @@ if(isset($_GET['http_error'])) {
 					</div>
 					<div class="col-md-4 pb-5">
 						<div class="container">
-							<a href="./FSRandomizer.exe" target="_blank" class="link-unstyled">
+							<a href="./FSRandomizer.zip" target="_blank" class="link-unstyled">
 								<div class="row mb-2 text-nowrap">
 									<div class="col p-0 text-nowrap"><b>Your list in Clone Hero</b></div>
 									<div class="col p-0 text-right align-self-center d-none d-lg-block"><img src="./images/+.png" /></div>
 								</div>
 							</a>
-							<div class="row text-nowrap"><p>Download our <a href="./FSRandomizer.exe" target="_blank">App</a> to bring your list to Clone Hero!</p></div>
-							<div class="row text-nowrap"><p>It's <a href="https://github.com/rafaelgpires/FSRandomizer-App/" target="_blank">Open Source</a> and requires using <a href="./Original Series.zip" target="_blank">these charts</a>.</p></div>
+							<div class="row text-nowrap"><p>Download our <a href="./FSRandomizer.zip" target="_blank">App</a> to bring your list to Clone Hero!</p></div>
+							<div class="row text-nowrap"><p>It's <a href="https://github.com/rafaelgpires/FSRandomizer-App/" target="_blank">Open Source</a> and requires using <a href="https://drive.google.com/open?id=10bUgi6oxG1wiYg1R41-G6oD-lzUEmlzz" target="_blank">these charts</a>.</p></div>
 						</div>
 					</div>
 				</div>
