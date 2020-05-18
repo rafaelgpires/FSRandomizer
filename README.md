@@ -33,6 +33,7 @@ Once the list has been created, it functions as a fully featured "FC Tracker", w
       - **Speed**: Enabled the speed stat and a column that allows you to give the maximum speed you've gotten the FC at,
       - **Score**: Enabled the score stat and a column that allows you to give the maximum score you've achieved in this song,
       - **Proofs**: Both Speed and Score allow you to submit proof of the claim with a URL (assumed an image or video).
+  - **Unlocker**: Press the FC count in stats to toggle the unlocker on/off, with the unlocker on the rest of the list will be hidden from you, you have to FC songs to unlock the encores and new chapters.
 
 ### Features: Flavour
   - **List Header Icon**: Reaching high FC counts unlocks a big "Difficulty Icon" above your list that represents your achievement.
