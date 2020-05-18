@@ -23,12 +23,12 @@ Once the list has been created, it functions as a fully featured "FC Tracker", w
 ### Features: Online
   - **Share your List**: Check other people's lists by just typing their list ID in the URL, or using the navbar input.
   - **Authenticating Owner**: Generates a password on creation that never gets displayed again, this password allows you to edit the list, creating a login system that doesn't need you to register. You're automatically logged to whatever list you create.
-  - **Responsive Javascript**: Page adapts in real-time to your changes without needing to reload while updating the server with AJAX
+  - **Responsive Javascript**: Page adapts in real-time to your changes without needing to reload to update the server.
 
 ### Features: List
   - **List name**: Simply click the title to edit it, limit 13 characters.
   - **List description**: Simply click the subtitle to edit it, limit 45 characters.
-  - **FC Tracker**: Enable the FC tracker, this action will enable "Stats" and add a column that holds a crown representing whether or not a song has been FC'd, an FC also makes it so the speed value attached to that song counts towards the total speed average.
+  - **FC Tracker**: Enable the FC tracker, this action will enable "Stats" and add a column that holds a crown representing whether a song has been FC'd, an FC also makes it so the speed value attached to that song counts towards the speed average.
       - **Stats**: Displays the totals associated with your list (amount of FCs, average Speed per FC, total score accumulated)
       - **Speed**: Enabled the speed stat and a column that allows you to give the maximum speed you've gotten the FC at.
       - **Score**: Enabled the score stat and a column that allows you to give the maximum score you've achieved in this song.
